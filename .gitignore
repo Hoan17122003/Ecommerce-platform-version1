@@ -16,6 +16,10 @@ g
 # OS
 .DS_Store
 
+#local env
+/.local.env
+
+
 # Tests
 /coverage
 /.nyc_output
