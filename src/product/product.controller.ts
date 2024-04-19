@@ -28,12 +28,7 @@ export class ProductController {
         @Body() kichThuocMauSacDTO: KichThuocMauSacDTO[],
         @Session() session: Record<any, string>,
     ) {
-        productDTO = {
-            
-        }
         try {
-            
-            
             const maNguoiBanHang = await session.user['payload'];
             return this.productService.create(productDTO, maNguoiBanHang, kichThuocMauSacDTO);
         } catch (error) {
