@@ -1,57 +1,107 @@
-import { DeepPartial, EntityRepository, Repository } from 'typeorm';
+import { DeepPartial, EntityMetadata, EntityRepository, getRepository, Repository, EntityTarget } from 'typeorm';
 import { SanPhamEntity, TaiKhoanEntity } from '../Entity/index.entity';
 import { dataSource } from '../database.providers';
 import { ProductDTO } from 'src/product/dto/product.dto';
+import { KichThuocMauSacEntity } from '../Entity/KichThuocMauSac.entity';
+import { KichThuocMauSacDTO } from 'src/product/dto/KichThuocMauSac.dto';
 
+// Hoàn ngày 17/04/2024 gửi Hoàn của tương lai đôi vài điều :
+// xin lỗi vì viết hiện tại t viết code như cái đặc cầu và comment cũng đéo chuẩn cái moẹ gì, logic thì phức tạp
+// t biết tương lai m sẽ chửi t nên t cũng gửi đôi lời tâm sự :), chạy được là được rồi đừng có đụng vào đụng vào là đéo chạy đâu :)
+
+// create repository not logic and can't handler
+export class SanPhamRepository extends Repository<SanPhamEntity> {}
+
+// create repository for logic business repository
 @EntityRepository(SanPhamEntity)
-export class SanPhamRepository extends Repository<SanPhamEntity> {
-    // public getInstance() {
-    //     if (!SanPhamRepository.repository) {
-    //         SanPhamRepository.repository = new SanPhamRepository();
-    //     }
-    //     return SanPhamRepository.repository;
-    // }
+export class ProductRepository {
+    public productRepository: Repository<SanPhamEntity>;
 
-    // create(): SanPhamEntity;
-    // create(entityLikeArray: DeepPartial<SanPhamEntity>[]): SanPhamEntity[];
-    // create(entityLike: DeepPartial<SanPhamEntity>): SanPhamEntity;
-    // create(entityLike?: unknown): SanPhamEntity | SanPhamEntity[] {
+    constructor() {
+        // const queryRunner = dataSource.createQueryRunner();
+        // if (queryRunner) console.log('queryRunner true');
+        // queryRunner.connect();
+        this.productRepository = dataSource.getRepository(SanPhamEntity);
+    }
 
-    // }
+    public async findAll(): Promise<SanPhamEntity[]> {
+        console.log('product : ', await this.productRepository.createQueryBuilder().getMany());
 
-    // the latest  version is not supported for this
-    // async findAll() {
-    //     const data = await this.createQueryBuilder().select('*').orderBy('GiaBan').getMany();
-    //     console.log('data : ', data);
+        const data = await this.productRepository.find({
+            select: {
+                TenSanPham: true,
+                GiaBan: true,
+                AnhSanPham: true,
+                MoTaSanPham: true,
+                ThuongHieu: true,
+                MaSanPham: true,
+            },
+        });
+        return data;
+    }
 
-    //     return data;
-    //     //  this.createQueryBuilder().select('*').orderBy('GiaBan').getMany();
-    // }
+    public async softDelete(
+        maSanPham: number,
+        maNguoiBanHang: number,
+    ): Promise<SanPhamEntity | SanPhamEntity[] | number> {
+        const isCheck = await this.productRepository.findOne({
+            where: {
+                MaSanPham: maSanPham,
+            },
+        });
+        if (isCheck) {
+            const data = await this.productRepository
+                .createQueryBuilder()
+                .softDelete()
+                .where('MaSanPham = :maSanPham', {
+                    maSanPham,
+                })
+                .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
+                    maNguoiBanHang,
+                })
+                .execute();
+            return data.affected;
+        }
+        throw new Error('product in trash can');
+    }
+
+    public async addProduct(
+        product: SanPhamEntity,
+        MaNguoiBanHang: number,
+        kichThuocMauSac: KichThuocMauSacDTO | KichThuocMauSacDTO[],
+    ): Promise<number | undefined> {
+        const productId: number = await this.productRepository.query(`
+        execute proc_themSanPham_NguoiBanHang
+            @MaNguoiBanHang = ${MaNguoiBanHang},
+            @TenSanPham = N'${product.getTenSanPham()}',
+            @GiaBan = ${product.getGiaBan()},
+            @AnhSanPham = '${product.getAnhSanPham()}' ,
+            @MoTaSanPham = N'${product.getMoTaSanPham()}' ,
+            @ThuongHieu = N'${product.getThuongHieu()}',
+            @categoryId = N'A001'`);
+
+        for (let element in kichThuocMauSac) {
+            console.log('elment : ', element);
+        }
+
+        return productId;
+    }
+
+    public async restore(
+        maSanPham: number,
+        maNguoiBanHang: number,
+    ): Promise<SanPhamEntity | SanPhamEntity[] | number | undefined> {
+        const data = await this.productRepository
+            .createQueryBuilder()
+            .restore()
+            .where('MaSanPham = :maSanPham', {
+                maSanPham,
+            })
+            .andWhere('deletedDate != null')
+            .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
+                maNguoiBanHang,
+            })
+            .execute();
+        return data.affected;
+    }
 }
-
-export const findAllProduct = async (): Promise<SanPhamEntity> => {
-    const sanPhamRepository = await dataSource.getRepository(TaiKhoanEntity);
-    const products = await sanPhamRepository.createQueryBuilder().select('*').getMany();
-    console.log('product : ', products);
-    return products;
-};
-
-export const addProduct = async (product: SanPhamEntity, MaNguoiBanHang: number): Promise<number | undefined> => {
-    const sanPhamRepository = await dataSource.getRepository(TaiKhoanEntity);
-
-    console.log('product : ', product);
-    console.log('gia : ', typeof MaNguoiBanHang);
-
-    const productId: number = await sanPhamRepository.query(`
-    execute proc_themSanPham_NguoiBanHang
-        @MaNguoiBanHang = ${MaNguoiBanHang},
-    	@TenSanPham = '${product.getTenSanPham()}',
-    	@GiaBan = ${product.getGiaBan()},
-    	@AnhSanPham = '${product.getAnhSanPham()}' ,
-    	@MoTaSanPham = '${product.getMoTaSanPham()}' ,
-    	@SoLuongSanPham = ${product.getSoLuongSanPham()},
-    	@ThuongHieu = '${product.getThuongHieu()}',
-    	@categoryId = N'A001'`);
-
-    return productId;
-};

@@ -16,9 +16,6 @@ export class ProductDTO {
     @IsNotEmpty()
     MoTaSanPham: string;
 
-    @IsNotEmpty()
-    SoLuongSanPham: number;
-
     @IsString()
     @IsNotEmpty()
     ThuongHieu: string;

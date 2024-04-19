@@ -1,7 +1,8 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BinhLuanDanhGia } from './BinhLuanDanhGia.entity';
 import { ChiTietDonHang } from './ChiTietDonHang.entity';
 import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
+import { KichThuocMauSacEntity } from './KichThuocMauSac.entity';
 
 @Entity('SanPham')
 export class Product extends BaseEntity {
@@ -10,7 +11,6 @@ export class Product extends BaseEntity {
         GiaBan: number,
         AnhSanPham: string,
         MoTaSanPham: string,
-        SoLuongSanPham: number,
         ThuongHieu: string,
     ) {
         super();
@@ -18,7 +18,6 @@ export class Product extends BaseEntity {
         this.GiaBan = GiaBan;
         this.AnhSanPham = AnhSanPham;
         this.MoTaSanPham = MoTaSanPham;
-        this.SoLuongSanPham = SoLuongSanPham;
         this.ThuongHieu = ThuongHieu;
     }
 
@@ -49,11 +48,6 @@ export class Product extends BaseEntity {
     MoTaSanPham: string;
 
     @Column({
-        type: 'int',
-    })
-    SoLuongSanPham: number;
-
-    @Column({
         type: 'nvarchar',
         length: 250,
     })
@@ -67,6 +61,14 @@ export class Product extends BaseEntity {
 
     @OneToMany(() => ChiTietMaGiamGia, (chiTietMaGiamGia) => chiTietMaGiamGia.product)
     chitietmagiamgia: ChiTietMaGiamGia[];
+
+    @OneToMany(() => KichThuocMauSacEntity, (kichThuocMauSac) => kichThuocMauSac.maSanPham)
+    kichThuocMauSac: KichThuocMauSacEntity[];
+
+    @DeleteDateColumn({
+        default: null,
+    })
+    deletedDate: Date;
 
     public getGiaBan(): number {
         return this.GiaBan;
@@ -82,9 +84,6 @@ export class Product extends BaseEntity {
 
     public getMoTaSanPham(): string {
         return this.MoTaSanPham;
-    }
-    public getSoLuongSanPham(): number {
-        return this.SoLuongSanPham;
     }
 
     public getThuongHieu(): string {
