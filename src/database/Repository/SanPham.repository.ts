@@ -102,6 +102,36 @@ export class ProductRepository {
                 maNguoiBanHang,
             })
             .execute();
+        console.log('data : ', data);
         return data.affected;
+    }
+
+    public async findDelete(maSanPham: number[], maNguoiBanHang: number): Promise<Map<number, number>> {
+        try {
+            let isChecked: Map<number, number> = new Map<number, number>();
+            // const data = this.productRepository.query(
+            //     `select * from SanPham where MaSanPham = ${element} and MaNguoiBanHang = ${maNguoiBanHang} and deletedDate != null`,
+            // );
+
+            for (let id of maSanPham) {
+                await this.restore(id, maNguoiBanHang);
+                const data = await this.productRepository
+                    .createQueryBuilder()
+                    .delete()
+                    .where('MaSanPham = :id', {
+                        id,
+                    })
+                    .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
+                        maNguoiBanHang,
+                    })
+                    .execute();
+                isChecked.set(id, data.affected);
+                console.log('id : ', data.affected);
+            }
+            console.log('isChecked : ', isChecked);
+            return isChecked;
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 }

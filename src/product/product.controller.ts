@@ -1,4 +1,16 @@
-import { Controller, Get, Post, UseGuards, Body, Session, Delete, Param, ParseIntPipe } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    UseGuards,
+    Body,
+    Session,
+    Delete,
+    Param,
+    ParseIntPipe,
+    ParseArrayPipe,
+    ForbiddenException,
+} from '@nestjs/common';
 
 import { ProductService } from './product.service';
 import { Public } from 'src/decorators/auth.decorators';
@@ -38,7 +50,7 @@ export class ProductController {
 
     @Roles('NguoiBanHang')
     @Delete('remove/:ProductId')
-    async DeleteProduct(
+    async SoftDeleteProduct(
         @Param('ProductId', new ParseIntPipe()) maSanPham: number,
         @Session() session: Record<string, any>,
     ) {
@@ -52,5 +64,18 @@ export class ProductController {
         @Session() session: Record<string, any>,
     ) {
         return this.productService.restore(maSanPham, session.user['payload']);
+    }
+
+    @Roles('NguoiBanHang')
+    @Delete('trashCan/delete')
+    async DeleteProduct(
+        @Body('MaSanPham', new ParseArrayPipe()) maSanPham: number[],
+        @Session() session: Record<string, any>,
+    ) {
+        try {
+            return this.productService.DeletedProduct(maSanPham, session.user['paylaod']);
+        } catch (error) {
+            throw new ForbiddenException(error);
+        }
     }
 }
