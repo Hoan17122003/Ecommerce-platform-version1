@@ -10,8 +10,8 @@ export class MailService {
         return await this.mailerService.sendMail({
             to: user.email,
             // from: '"Support Team" <support@example.com>', // override default from
-            subject: 'Welcome to Nice App! Confirm your Email',
-            html: `hello sending`,
+            subject: user.subject,
+            html: `your validate token : <b>${user.content}</b>`,
         });
     }
 }

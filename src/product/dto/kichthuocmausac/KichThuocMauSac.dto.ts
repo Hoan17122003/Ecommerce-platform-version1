@@ -2,13 +2,17 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, isNotEmpty } from 'class-va
 
 export class KichThuocMauSacDTO {
     @IsNotEmpty()
-    @IsString()
     KichThuoc: string;
 
     @IsNotEmpty()
-    @IsString()
     MauSac: string;
+
     @IsNotEmpty()
-    @IsNumber()
     SoLuong: number;
+
+    constructor(KichThuoc: string, MauSac: string, SoLuong: number) {
+        this.KichThuoc = KichThuoc;
+        this.MauSac = MauSac;
+        this.SoLuong = SoLuong;
+    }
 }

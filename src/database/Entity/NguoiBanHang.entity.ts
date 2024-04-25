@@ -15,7 +15,7 @@ import { Chat } from './Chat.entity';
 import { DonHang } from './DonHang.entity';
 import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
 import { ViNguoiDung } from './ViNguoiDung.entity';
-import { TaiKhoanEntity } from './index.entity';
+import { SanPhamEntity, TaiKhoanEntity } from './index.entity';
 
 @Entity('NguoiBanHang')
 export class NguoiBanHang extends BaseEntity {

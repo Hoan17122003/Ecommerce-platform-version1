@@ -10,9 +10,9 @@ import { MailService } from 'src/mail/mai.service';
 import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-    imports: [DatabaseModule, AccountModule, JwtModule.register({})],
+    imports: [DatabaseModule, AccountModule, JwtModule.register({}), MailModule],
     controllers: [AuthController],
-    providers: [AuthService],
+    providers: [AuthService, MailService],
     exports: [AuthService],
 })
 export class AuthModule implements NestModule {

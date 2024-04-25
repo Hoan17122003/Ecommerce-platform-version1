@@ -29,7 +29,7 @@ import { AuthService } from './auth/auth.service';
         AccountModule,
         AuthModule,
         JwtModule.register({}),
-        ProductModule,
+        
     ],
     // providers: [
     //     {

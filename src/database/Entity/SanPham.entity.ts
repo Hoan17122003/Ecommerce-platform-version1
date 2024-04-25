@@ -1,8 +1,9 @@
-import { BaseEntity, Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BinhLuanDanhGia } from './BinhLuanDanhGia.entity';
 import { ChiTietDonHang } from './ChiTietDonHang.entity';
 import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
 import { KichThuocMauSacEntity } from './KichThuocMauSac.entity';
+import { NguoiBanHangEntity } from './index.entity';
 
 @Entity('SanPham')
 export class Product extends BaseEntity {
@@ -61,9 +62,6 @@ export class Product extends BaseEntity {
 
     @OneToMany(() => ChiTietMaGiamGia, (chiTietMaGiamGia) => chiTietMaGiamGia.product)
     chitietmagiamgia: ChiTietMaGiamGia[];
-
-    @OneToMany(() => KichThuocMauSacEntity, (kichThuocMauSac) => kichThuocMauSac.maSanPham)
-    kichThuocMauSac: KichThuocMauSacEntity[];
 
     @DeleteDateColumn({
         default: null,

@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/database/database.module';
 
-import { unknowProviders } from '../middleware/dynamic-providers.providers'
+import { unknowProviders } from '../middleware/dynamic-providers.providers';
 import { NguoiBanHangEntity } from 'src/database/Entity/index.entity';
-import { VenderService } from './vender.service'
+import { VenderService } from './vender.service';
+import { VenderController } from './vender.controller';
+import { ProductModule } from 'src/product/product.module';
 
 @Module({
-    imports: [DatabaseModule],
+    imports: [DatabaseModule, ProductModule],
     providers: [unknowProviders('NGUOIBANHANG_REPOSITORY', NguoiBanHangEntity), VenderService],
-    exports: [VenderModule]
+    controllers: [VenderController],
+    exports: [VenderModule],
 })
-export class VenderModule { }
+export class VenderModule {}

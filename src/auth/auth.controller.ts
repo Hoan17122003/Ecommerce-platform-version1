@@ -19,11 +19,15 @@ import { LocalAuthGuard } from './guard/LocalAuth.guard';
 import { JwtAccessTokenGuard } from './guard/JwtAccessAuth.guard';
 import { Public } from 'src/decorators/auth.decorators';
 import { JwtRefreshTokenGuard } from './guard/JwtRefreshAuth.guard';
+import { MailService } from 'src/mail/mai.service';
 
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly mailService: MailService,
+    ) {}
 
     @Public()
     @UseGuards(LocalAuthGuard)
@@ -59,15 +63,15 @@ export class AuthController {
         return res.status(201).json({ accessToken: this.authService.generateAccessToken(session.token.payload) });
     }
 
-    // @Public()
-    // @Post('SendMail')
-    // async sendMail(@Body() data: Record<string, any>) {
-    //     return this.mailService.sendUserConfirmation({
-    //         email: data.email,
-    //         subject: data.subject,
-    //         content: data.content,
-    //     });
-    //     // return SendMail(data.email,data.subject,data.content)
-    //     // return 'hehehe';
-    // }
+    @Public()
+    @Post('SendMail')
+    async sendMail(@Body() data: Record<string, any>) {
+        return this.mailService.sendUserConfirmation({
+            email: data.email,
+            subject: data.subject,
+            content: data.content,
+        });
+        // return SendMail(data.email,data.subject,data.content)
+        // return 'hehehe';
+    }
 }

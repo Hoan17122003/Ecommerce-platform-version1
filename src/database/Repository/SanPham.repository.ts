@@ -1,9 +1,18 @@
-import { DeepPartial, EntityMetadata, EntityRepository, getRepository, Repository, EntityTarget } from 'typeorm';
+import {
+    DeepPartial,
+    EntityMetadata,
+    EntityRepository,
+    getRepository,
+    Repository,
+    EntityTarget,
+    DataSource,
+} from 'typeorm';
 import { SanPhamEntity, TaiKhoanEntity } from '../Entity/index.entity';
 import { dataSource } from '../database.providers';
-import { ProductDTO } from 'src/product/dto/product.dto';
+import { ProductDTO } from 'src/product/dto/product/product.dto';
 import { KichThuocMauSacEntity } from '../Entity/KichThuocMauSac.entity';
-import { KichThuocMauSacDTO } from 'src/product/dto/KichThuocMauSac.dto';
+import { KichThuocMauSacDTO } from 'src/product/dto/kichthuocmausac/KichThuocMauSac.dto';
+import { NguoiBanHang } from '../Entity/NguoiBanHang.entity';
 
 // Hoàn ngày 17/04/2024 gửi Hoàn của tương lai đôi vài điều :
 // xin lỗi vì viết hiện tại t viết code như cái đặc cầu và comment cũng đéo chuẩn cái moẹ gì, logic thì phức tạp
@@ -18,15 +27,15 @@ export class ProductRepository {
     public productRepository: Repository<SanPhamEntity>;
 
     constructor() {
-        // const queryRunner = dataSource.createQueryRunner();
-        // if (queryRunner) console.log('queryRunner true');
-        // queryRunner.connect();
+        const queryRunner = dataSource.createQueryRunner();
+        if (queryRunner) console.log('queryRunner true');
+        queryRunner.connect();
         this.productRepository = dataSource.getRepository(SanPhamEntity);
     }
 
     public async findAll(): Promise<SanPhamEntity[]> {
-        console.log('product : ', await this.productRepository.createQueryBuilder().getMany());
-
+        // console.log('product : ', await this.productRepository.createQueryBuilder().getMany());
+        console.log('hehehe');
         const data = await this.productRepository.find({
             select: {
                 TenSanPham: true,
@@ -65,14 +74,15 @@ export class ProductRepository {
         throw new Error('product in trash can');
     }
 
+    // chưa xử lý được nhiều phần tử con cùng 1 lúc
     public async addProduct(
         product: SanPhamEntity,
-        MaNguoiBanHang: number,
-        kichThuocMauSac: KichThuocMauSacDTO | KichThuocMauSacDTO[],
+        maNguoiBanHang: number,
+        kichThuocMauSac: KichThuocMauSacDTO,
     ): Promise<number | undefined> {
         const productId: number = await this.productRepository.query(`
         execute proc_themSanPham_NguoiBanHang
-            @MaNguoiBanHang = ${MaNguoiBanHang},
+            @MaNguoiBanHang = ${maNguoiBanHang},
             @TenSanPham = N'${product.getTenSanPham()}',
             @GiaBan = ${product.getGiaBan()},
             @AnhSanPham = '${product.getAnhSanPham()}' ,
@@ -80,9 +90,17 @@ export class ProductRepository {
             @ThuongHieu = N'${product.getThuongHieu()}',
             @categoryId = N'A001'`);
 
-        for (let element in kichThuocMauSac) {
-            console.log('elment : ', element);
-        }
+        console.log('typeof product :', productId[0].MaSanPham);
+
+        const kichthuocmausacEntity = new KichThuocMauSacEntity();
+        const kichthuocmausacRepository = await dataSource.getRepository(KichThuocMauSacEntity);
+        let SoLuong = Number(kichThuocMauSac.SoLuong);
+        kichthuocmausacEntity.KichThuoc = kichThuocMauSac.KichThuoc;
+        kichthuocmausacEntity.MauSac = kichThuocMauSac.MauSac;
+        kichthuocmausacEntity.SoLuong = SoLuong;
+        kichthuocmausacEntity.MaSanPham = productId[0].MaSanPham;
+        // const a = await kichthuocmausacRepository.create(kichthuocmausacEntity);
+        kichthuocmausacRepository.save(kichthuocmausacEntity);
 
         return productId;
     }
@@ -97,41 +115,89 @@ export class ProductRepository {
             .where('MaSanPham = :maSanPham', {
                 maSanPham,
             })
-            .andWhere('deletedDate != null')
+            .andWhere('deletedDate is not null')
             .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
                 maNguoiBanHang,
             })
             .execute();
-        console.log('data : ', data);
         return data.affected;
     }
 
-    public async findDelete(maSanPham: number[], maNguoiBanHang: number): Promise<Map<number, number>> {
+    public async findDelete(maSanPham: number, maNguoiBanHang: number): Promise<number> {
         try {
-            let isChecked: Map<number, number> = new Map<number, number>();
-            // const data = this.productRepository.query(
-            //     `select * from SanPham where MaSanPham = ${element} and MaNguoiBanHang = ${maNguoiBanHang} and deletedDate != null`,
-            // );
+            const data = await this.productRepository
+                .createQueryBuilder()
+                .delete()
+                .where('MaSanPham = :id', {
+                    id: maSanPham,
+                })
+                .andWhere('deletedDate is not null')
+                .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
+                    maNguoiBanHang,
+                })
+                .execute();
 
-            for (let id of maSanPham) {
-                await this.restore(id, maNguoiBanHang);
-                const data = await this.productRepository
-                    .createQueryBuilder()
-                    .delete()
-                    .where('MaSanPham = :id', {
-                        id,
-                    })
-                    .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
-                        maNguoiBanHang,
-                    })
-                    .execute();
-                isChecked.set(id, data.affected);
-                console.log('id : ', data.affected);
-            }
-            console.log('isChecked : ', isChecked);
-            return isChecked;
+            return data.affected;
         } catch (error) {
             throw new Error(error);
         }
+    }
+
+    // task 19/04
+    public async ChangeInformationProduct(
+        productDTO: ProductDTO,
+        kichThuocMauSacDTO: KichThuocMauSacDTO,
+        maNguoiBanHang: number,
+    ): Promise<number> {
+        // const isKichThuocMauSac;
+        // const isProduct;
+        // const kichthuocmausacRepository = await dataSource.getRepository(KichThuocMauSacEntity);
+
+        // await Promise.all([
+        //     this.productRepository
+        //         .createQueryBuilder()
+        //         .update()
+        //         .set({
+        //             ...productDTO,
+        //         })
+        //         .where('MaNguoiBanHang = :maNguoiBanHang', {
+        //             maNguoiBanHang,
+        //         })
+        //         .execute(),
+        //     kichthuocmausacRepository.createQueryBuilder().update().set({}),
+        // ]);
+        return 1;
+    }
+    public async InformationProduct(
+        ProductId: number,
+        maNguoiBanHang: number,
+    ): Promise<{ SanPhamEntity; KichThuocMauSacEntity }> {
+        const sanpham = await this.productRepository.findOne({
+            select: {
+                TenSanPham: true,
+                MoTaSanPham: true,
+                GiaBan: true,
+                AnhSanPham: true,
+                ThuongHieu: true,
+            },
+            where: {
+                MaSanPham: ProductId,
+            },
+        });
+        const kichthuocmausacRepository = await dataSource.getRepository(KichThuocMauSacEntity);
+
+        const kichthuocmausac = await kichthuocmausacRepository
+            .createQueryBuilder()
+            .where('MaSanPham = :ProductId', {
+                ProductId,
+            })
+            .getMany();
+        console.log('kichthuocmausac : ', kichthuocmausac);
+        console.log('SanPham : ', sanpham);
+
+        return {
+            SanPhamEntity: sanpham,
+            KichThuocMauSacEntity: kichthuocmausac,
+        };
     }
 }

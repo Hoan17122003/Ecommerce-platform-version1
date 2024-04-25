@@ -12,11 +12,14 @@ export class KichThuocMauSacEntity {
         type: 'nvarchar',
         length: 20,
     })
-    Mausac: string;
+    MauSac: string;
 
-    @Column('int')
+    @Column({ type: 'int' })
     SoLuong: number;
 
-    @ManyToOne(() => SanPhamEntity, (sanPhamEntity) => sanPhamEntity.kichThuocMauSac)
-    maSanPham: SanPhamEntity;
+    @PrimaryColumn({
+        type: 'int',
+        name: 'MaSanPham',
+    })
+    MaSanPham: number;
 }

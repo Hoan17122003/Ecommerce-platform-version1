@@ -144,4 +144,22 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
         else if (vaitro === 'NguoiMuaHang') await this.venderService.delete(id);
         return 'xoá thành công';
     }
+
+    async findByEmail(email: string): Promise<TaiKhoanEntity> {
+        return this.accountRepository.findOne({
+            select: {
+                TaiKhoanId: true,
+            },
+            where: {
+                Email: email,
+            },
+        });
+    }
+
+    async SetActive(email: string): Promise<number> {
+        const flag = await this.accountRepository.update(email, {
+            trangThaiTaiKhoan: 1,
+        });
+        return flag.affected;
+    }
 }

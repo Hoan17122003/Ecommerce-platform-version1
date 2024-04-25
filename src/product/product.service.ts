@@ -5,9 +5,9 @@ import { SanPhamRepository } from 'src/database/Repository/SanPham.repository';
 
 // import { ProductRepository } from 'src/database/Repository/SanPham.repository';
 import { BaseService } from 'src/database/base.service';
-import { ProductDTO } from './dto/product.dto';
+import { ProductDTO } from './dto/product/product.dto';
 import { ProductRepository } from '../database/Repository/SanPham.repository';
-import { KichThuocMauSacDTO } from './dto/KichThuocMauSac.dto';
+import { KichThuocMauSacDTO } from './dto/kichthuocmausac/KichThuocMauSac.dto';
 
 @Injectable()
 export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository> {
@@ -19,18 +19,20 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
     }
 
     async AllProduct(): Promise<SanPhamEntity[]> {
-        return this.productRepository.findAll();
+        try {
+            return this.productRepository.findAll();
+        } catch (error) {
+            console.log('hehehe');
+            throw new Error(error);
+        }
     }
 
     async create(
         productDTO: ProductDTO,
         maNguoiBanHang: number,
-        kichThuocMauSac: KichThuocMauSacDTO | KichThuocMauSacDTO[],
+        kichThuocMauSac: KichThuocMauSacDTO,
     ): Promise<number | undefined> {
         try {
-            // if()
-            console.log('product : ', productDTO);
-
             const sanPham = new SanPhamEntity(
                 productDTO.TenSanPham,
                 productDTO.GiaBan,
@@ -57,17 +59,35 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
         return this.productRepository.restore(maSanPham, maNguoiBanHang);
     }
 
-    async DeletedProduct(maSanPham: number[], maNguoiBanHang: number): Promise<number[]> {
+    async DeletedProduct(maSanPham: number, maNguoiBanHang: number): Promise<string> {
         try {
             const result = await this.productRepository.findDelete(maSanPham, maNguoiBanHang);
-            for (let i of maSanPham) {
-                if (result.get(i) == 0) throw new ForbiddenException(`lỗi ${i} ...`);
-            }
-            console.log('result : ', result);
-
-            return [1];
+            if (!result) throw new ForbiddenException('không thể xoá');
+            return 'xoá thành công';
         } catch (error) {
             throw new ForbiddenException(error);
         }
+    }
+
+    async getInformationProduct(
+        ProductId: number,
+        maNguoiBanHang: number,
+    ): Promise<{ SanPhamEntity; KichThuocMauSacEntity }> {
+        return this.productRepository.InformationProduct(ProductId, maNguoiBanHang);
+    }
+
+    async ChangeInformationProduct(
+        productDTO: ProductDTO,
+        kichThuocMauSacDTO: KichThuocMauSacDTO,
+        maNguoiBanHang: number,
+    ): Promise<number> {
+        // let container = [];
+        // for (let i in data) {
+        //     if (data[i] ?? 0) {
+        //         container.push(i);
+        //     }
+        // }
+
+        return this.productRepository.ChangeInformationProduct(productDTO, kichThuocMauSacDTO, maNguoiBanHang);
     }
 }

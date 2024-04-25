@@ -71,7 +71,7 @@ export class TaiKhoan extends BaseEntity {
     @Column({
         name: 'isActive',
         type: 'bit',
-        default: 1,
+        default: 0,
     })
     trangThaiTaiKhoan: number;
 

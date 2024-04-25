@@ -13,9 +13,11 @@ import { AccountController } from './account.controller';
 import { dataSource } from 'src/database/database.providers';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAccessTokenGuard } from 'src/auth/guard/JwtAccessAuth.guard';
+import { MailService } from 'src/mail/mai.service';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-    imports: [DatabaseModule, JwtModule.register({})],
+    imports: [DatabaseModule, JwtModule.register({}), MailModule],
     providers: [
         unknowProviders('ACCOUNT_REPOSITORY', AccountEntity),
         {
@@ -37,6 +39,7 @@ import { JwtAccessTokenGuard } from 'src/auth/guard/JwtAccessAuth.guard';
             useClass: JwtAccessTokenGuard,
         },
         JwtService,
+        MailService,
     ],
     controllers: [AccountController],
     exports: [AccountService],
