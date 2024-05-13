@@ -28,6 +28,7 @@ import { UserDTO } from './dto/user.dto';
 import { Roles } from 'src/decorators/role.decoratos';
 import { JwtRefreshTokenGuard } from 'src/auth/guard/JwtRefreshAuth.guard';
 import { MailService } from 'src/mail/mai.service';
+import { LocalAuthGuard } from 'src/auth/guard/LocalAuth.guard';
 
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Account')

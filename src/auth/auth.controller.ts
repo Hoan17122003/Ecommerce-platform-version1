@@ -56,6 +56,7 @@ export class AuthController {
         return this.authService.findById(2040);
     }
 
+    //client sẽ kiểm tra token access token đó đã hết hạn hay chưa và gửi 1 yêu cầu đến api để generate 1 token mới
     @Public()
     @UseGuards(JwtRefreshTokenGuard)
     @Get('get-access-token')
@@ -63,15 +64,15 @@ export class AuthController {
         return res.status(201).json({ accessToken: this.authService.generateAccessToken(session.token.payload) });
     }
 
-    @Public()
-    @Post('SendMail')
-    async sendMail(@Body() data: Record<string, any>) {
-        return this.mailService.sendUserConfirmation({
-            email: data.email,
-            subject: data.subject,
-            content: data.content,
-        });
-        // return SendMail(data.email,data.subject,data.content)
-        // return 'hehehe';
-    }
+    // @Public()
+    // @Post('SendMail')
+    // async sendMail(@Body() data: Record<string, any>) {
+    //     return this.mailService.sendUserConfirmation({
+    //         email: data.email,
+    //         subject: data.subject,
+    //         content: data.content,
+    //     });
+    //     // return SendMail(data.email,data.subject,data.content)
+    //     // return 'hehehe';
+    // }
 }

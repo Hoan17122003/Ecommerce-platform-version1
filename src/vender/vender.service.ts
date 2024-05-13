@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { BaseService } from 'src/database/base.service';
 import { NguoiBanHangRepository } from 'src/database/Repository/NguoiBanHang.repository';
 import { VenderDTO } from './dto/vender.dto';
+import { ProductService } from 'src/product/product.service';
+import { DiscountCodeService } from 'src/discountcode/discountcode.service';
 
 @Global()
 @Injectable({})
@@ -24,6 +26,7 @@ export class VenderService extends BaseService<NguoiBanHangEntity, NguoiBanHangR
         nguoiBanHangEntity.NgayThangNamSInh = nguoiBanHang.NgayThangNamSinh;
         nguoiBanHangEntity.DiaChi = nguoiBanHang.DiaChi;
         nguoiBanHangEntity.MaNguoiBanHang = taiKhoan.TaiKhoanId;
+        nguoiBanHangEntity.sanPham = null;
         nguoiBanHangEntity.chats = null;
         nguoiBanHangEntity.donHang = null;
         nguoiBanHangEntity.chiTietMaGiamGia = null;
@@ -41,5 +44,9 @@ export class VenderService extends BaseService<NguoiBanHangEntity, NguoiBanHangR
 
     getRepository() {
         return this.nguoiBanHangRepository;
+    }
+
+    async getThisData(id: number) {
+        return this.findById(id);
     }
 }

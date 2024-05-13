@@ -1,26 +1,34 @@
-import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, OneToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Product } from "./SanPham.entity";
-import { NguoiBanHang } from "./NguoiBanHang.entity";
-import { MaGiamGia } from "./MaGiamGia.entity"
+import {
+    Entity,
+    Column,
+    PrimaryColumn,
+    OneToOne,
+    JoinColumn,
+    OneToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    BaseEntity,
+} from 'typeorm';
+import { Product } from './SanPham.entity';
+import { NguoiBanHang } from './NguoiBanHang.entity';
+import { MaGiamGia } from './MaGiamGia.entity';
 
 @Entity('ChiTietMaGiamGia')
-export class ChiTietMaGiamGia {
-
+export class ChiTietMaGiamGia extends BaseEntity {
     @PrimaryGeneratedColumn('identity')
-    chiTietMaGiamGiaId: number
+    chiTietMaGiamGiaId: number;
 
-    @ManyToOne(() => Product, product => product.chitietmagiamgia)
-    product: Product
+    @ManyToOne(() => Product, (product) => product.chitietmagiamgia)
+    product: Product;
 
+    @ManyToOne(() => MaGiamGia, (maGiamGia) => maGiamGia.chitietmagiamgia)
+    MaGiamGiaId: MaGiamGia;
 
-    @ManyToOne(() => MaGiamGia, maGiamGia => maGiamGia.chitietmagiamgia)
-    MaGiamGiaId: MaGiamGia
-
-    @ManyToOne(() => NguoiBanHang, nguoiBanHang => nguoiBanHang.chiTietMaGiamGia)
-    nguoiBanHang: NguoiBanHang
+    @ManyToOne(() => NguoiBanHang, (nguoiBanHang) => nguoiBanHang.chiTietMaGiamGia)
+    nguoiBanHang: NguoiBanHang;
 
     @Column({
-        type: 'int'
+        type: 'int',
     })
-    SoLuongSanPhamKhuyenMai: number
+    SoLuongSanPhamKhuyenMai: number;
 }

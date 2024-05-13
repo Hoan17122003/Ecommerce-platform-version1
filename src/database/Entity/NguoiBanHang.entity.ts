@@ -62,6 +62,9 @@ export class NguoiBanHang extends BaseEntity {
     @OneToMany(() => DonHang, (donHang) => donHang.nguoiBanHang)
     donHang: DonHang[];
 
+    // @OneToMany(() => SanPhamEntity, (sanPham) => sanPham.nguoibanhang)
+    // sanPham: SanPhamEntity[];
+
     @OneToMany(() => ChiTietMaGiamGia, (chiTietMaGiamGia) => chiTietMaGiamGia.nguoiBanHang)
     chiTietMaGiamGia: ChiTietMaGiamGia[];
 

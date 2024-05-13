@@ -4,6 +4,7 @@ import { ChiTietDonHang } from './ChiTietDonHang.entity';
 import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
 import { KichThuocMauSacEntity } from './KichThuocMauSac.entity';
 import { NguoiBanHangEntity } from './index.entity';
+import { NguoiBanHang } from './NguoiBanHang.entity';
 
 @Entity('SanPham')
 export class Product extends BaseEntity {
@@ -13,6 +14,7 @@ export class Product extends BaseEntity {
         AnhSanPham: string,
         MoTaSanPham: string,
         ThuongHieu: string,
+        // nguoibanhang: NguoiBanHangEntity,
     ) {
         super();
         this.TenSanPham = TenSanPham;
@@ -20,6 +22,10 @@ export class Product extends BaseEntity {
         this.AnhSanPham = AnhSanPham;
         this.MoTaSanPham = MoTaSanPham;
         this.ThuongHieu = ThuongHieu;
+        // this.nguoibanhang = nguoibanhang;
+        this.binhLuanDanhGia = null;
+        this.orderDetail = null;
+        this.chitietmagiamgia = null;
     }
 
     @PrimaryGeneratedColumn('identity')
@@ -62,6 +68,15 @@ export class Product extends BaseEntity {
 
     @OneToMany(() => ChiTietMaGiamGia, (chiTietMaGiamGia) => chiTietMaGiamGia.product)
     chitietmagiamgia: ChiTietMaGiamGia[];
+
+    @Column({
+        type: 'int',
+        name: 'MaNguoiBanHang',
+    })
+    nguoibanhang: number;
+
+    // @ManyToOne(() => NguoiBanHangEntity, nguoiBanHang => nguoiBanHang.sanPham)
+    // nguoiBanHang: NguoiBanHang;
 
     @DeleteDateColumn({
         default: null,

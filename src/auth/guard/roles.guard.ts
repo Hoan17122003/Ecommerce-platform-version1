@@ -14,7 +14,6 @@ export class RolesGuard implements CanActivate {
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        console.log('2...');
         const roles: string[] = await this.reflactor.getAllAndOverride(ROLES, [
             context.getHandler(),
             context.getClass(),

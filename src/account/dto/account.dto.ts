@@ -1,5 +1,6 @@
-import { IsEmail, IsNotEmpty, MaxLength, IsStrongPassword, IsEmpty, isEnum, IsOptional } from 'class-validator';
-
+import { IsEmail, IsNotEmpty, MaxLength, IsStrongPassword, IsEmpty, isEnum, IsOptional, IsEnum } from 'class-validator';
+import { UserRole } from '../enums/role.enum';
+import { Transform } from 'stream';
 
 export class TaiKhoanDTO {
     @IsNotEmpty()
@@ -24,5 +25,6 @@ export class TaiKhoanDTO {
     AnhDaiDien: string;
 
     @IsNotEmpty()
+    @IsEnum(UserRole)
     VaiTro: string;
 }

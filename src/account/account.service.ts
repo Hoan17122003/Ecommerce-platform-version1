@@ -20,6 +20,7 @@ import { VenderDTO } from 'src/vender/dto/vender.dto';
 import { getProfile, findInformation, setRefreshToken } from 'src/database/Repository/TaiKhoan.repository';
 import { UserDTO } from './dto/user.dto';
 import { DEFAULT_EAGER_REFRESH_THRESHOLD_MILLIS } from 'google-auth-library/build/src/auth/authclient';
+import { LocalAuthGuard } from 'src/auth/guard/LocalAuth.guard';
 // import repository buyer and vender
 
 @Injectable({

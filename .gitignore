@@ -17,7 +17,7 @@ g
 .DS_Store
 
 #local env
-/.local.env
+.local.env
 
 
 # Tests

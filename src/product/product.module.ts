@@ -24,5 +24,6 @@ import { AccountModule } from 'src/account/account.module';
         JwtService,
     ],
     controllers: [ProductController],
+    exports: [ProductService],
 })
 export class ProductModule {}

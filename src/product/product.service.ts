@@ -1,6 +1,6 @@
 import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 
-import { SanPhamEntity } from 'src/database/Entity/index.entity';
+import { NguoiBanHangEntity, SanPhamEntity } from 'src/database/Entity/index.entity';
 import { SanPhamRepository } from 'src/database/Repository/SanPham.repository';
 
 // import { ProductRepository } from 'src/database/Repository/SanPham.repository';
@@ -29,9 +29,12 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
 
     async create(
         productDTO: ProductDTO,
+        nguoiBanHang: NguoiBanHangEntity,
         maNguoiBanHang: number,
         kichThuocMauSac: KichThuocMauSacDTO,
     ): Promise<number | undefined> {
+        console.log('thông tin người bán hàng : ', nguoiBanHang);
+
         try {
             const sanPham = new SanPhamEntity(
                 productDTO.TenSanPham,
@@ -40,11 +43,14 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
                 productDTO.MoTaSanPham,
                 productDTO.ThuongHieu,
             );
-            const result = await this.productRepository.addProduct(sanPham, maNguoiBanHang, kichThuocMauSac);
+            sanPham.maNguoiBanHang = nguoiBanHang.MaNguoiBanHang;
+
+            console.log('SanPham Entity : ', sanPham);
+            const result = await this.productRepository.addProduct(sanPham, nguoiBanHang, kichThuocMauSac);
 
             return result;
         } catch (error) {
-            throw new Error(error);
+            throw new ForbiddenException(error);
         }
     }
 
@@ -69,11 +75,19 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
         }
     }
 
-    async getInformationProduct(
+    async getInformationProductDetail(
         ProductId: number,
         maNguoiBanHang: number,
     ): Promise<{ SanPhamEntity; KichThuocMauSacEntity }> {
         return this.productRepository.InformationProduct(ProductId, maNguoiBanHang);
+    }
+
+    async getInformation(maSanPham: number, maNguoiBanHang: number) {
+        return this.repository
+            .createQueryBuilder()
+            .where('MaSanPham = :maSanPham', { maSanPham })
+            .andWhere('MaNguoiBanHang = :', { maNguoiBanHang })
+            .getOne();
     }
 
     async ChangeInformationProduct(

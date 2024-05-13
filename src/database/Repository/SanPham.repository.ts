@@ -7,7 +7,7 @@ import {
     EntityTarget,
     DataSource,
 } from 'typeorm';
-import { SanPhamEntity, TaiKhoanEntity } from '../Entity/index.entity';
+import { NguoiBanHangEntity, SanPhamEntity, TaiKhoanEntity } from '../Entity/index.entity';
 import { dataSource } from '../database.providers';
 import { ProductDTO } from 'src/product/dto/product/product.dto';
 import { KichThuocMauSacEntity } from '../Entity/KichThuocMauSac.entity';
@@ -77,20 +77,23 @@ export class ProductRepository {
     // chưa xử lý được nhiều phần tử con cùng 1 lúc
     public async addProduct(
         product: SanPhamEntity,
-        maNguoiBanHang: number,
+        nguoiBanHang: NguoiBanHangEntity,
         kichThuocMauSac: KichThuocMauSacDTO,
     ): Promise<number | undefined> {
-        const productId: number = await this.productRepository.query(`
-        execute proc_themSanPham_NguoiBanHang
-            @MaNguoiBanHang = ${maNguoiBanHang},
-            @TenSanPham = N'${product.getTenSanPham()}',
-            @GiaBan = ${product.getGiaBan()},
-            @AnhSanPham = '${product.getAnhSanPham()}' ,
-            @MoTaSanPham = N'${product.getMoTaSanPham()}' ,
-            @ThuongHieu = N'${product.getThuongHieu()}',
-            @categoryId = N'A001'`);
+        // const productId: number = await this.productRepository.query(`
+        // execute proc_themSanPham_NguoiBanHang
+        //     @MaNguoiBanHang = ${maNguoiBanHang},
+        //     @TenSanPham = N'${product.getTenSanPham()}',
+        //     @GiaBan = ${product.getGiaBan()},
+        //     @AnhSanPham = '${product.getAnhSanPham()}' ,
+        //     @MoTaSanPham = N'${product.getMoTaSanPham()}' ,
+        //     @ThuongHieu = N'${product.getThuongHieu()}',
+        //     @categoryId = N'A001'`);
 
-        console.log('typeof product :', productId[0].MaSanPham);
+        const productId: SanPhamEntity = await this.productRepository.save(product);
+        // const productId = await dataSource.getRepository(SanPhamEntity).insert(product).execute();
+
+        console.log('typeof product :', productId);
 
         const kichthuocmausacEntity = new KichThuocMauSacEntity();
         const kichthuocmausacRepository = await dataSource.getRepository(KichThuocMauSacEntity);
@@ -98,11 +101,11 @@ export class ProductRepository {
         kichthuocmausacEntity.KichThuoc = kichThuocMauSac.KichThuoc;
         kichthuocmausacEntity.MauSac = kichThuocMauSac.MauSac;
         kichthuocmausacEntity.SoLuong = SoLuong;
-        kichthuocmausacEntity.MaSanPham = productId[0].MaSanPham;
+        kichthuocmausacEntity.MaSanPham = productId.MaSanPham;
         // const a = await kichthuocmausacRepository.create(kichthuocmausacEntity);
         kichthuocmausacRepository.save(kichthuocmausacEntity);
 
-        return productId;
+        return productId.MaSanPham;
     }
 
     public async restore(

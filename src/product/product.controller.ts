@@ -12,6 +12,7 @@ import {
     ForbiddenException,
     Put,
     Query,
+    Patch,
 } from '@nestjs/common';
 
 import { ProductService } from './product.service';
@@ -24,6 +25,9 @@ import { session } from 'passport';
 import { KichThuocMauSacDTO } from './dto/kichthuocmausac/KichThuocMauSac.dto';
 import { ProductInner } from './dto/product/ProductInner';
 import { KichThuocMauSacInner } from './dto/kichthuocmausac/KichThuocMauSacInner';
+import { dataSource } from 'src/database/database.providers';
+import { NguoiBanHangEntity } from 'src/database/Entity/index.entity';
+import { UserRole } from 'src/account/enums/role.enum';
 
 // @UseGuards(RolesGuard)
 @UseGuards(JwtAccessTokenGuard)
@@ -37,7 +41,8 @@ export class ProductController {
         return this.productService.AllProduct();
     }
 
-    @Roles('NguoiBanHang')
+    @Roles(UserRole.NguoiBanHang)
+    @UseGuards(RolesGuard)
     @Post('createProduct')
     async CreateProduct(
         @Body()
@@ -61,14 +66,22 @@ export class ProductController {
 
         try {
             const maNguoiBanHang = await session.user['payload'];
+            const nguoiBanHang = await dataSource
+                .getRepository(NguoiBanHangEntity)
+                .createQueryBuilder()
+                .where('MaNguoiBanHang = :maNguoiBanHang', {
+                    maNguoiBanHang,
+                })
+                .getOne();
 
-            return this.productService.create(product, maNguoiBanHang, kichThuocMauSac);
+            return this.productService.create(product, nguoiBanHang, maNguoiBanHang, kichThuocMauSac);
         } catch (error) {
-            throw new Error(error);
+            throw new ForbiddenException(error);
         }
     }
 
     @Roles('NguoiBanHang')
+    @UseGuards(RolesGuard)
     @Delete('remove/:ProductId')
     async SoftDeleteProduct(
         @Param('ProductId', new ParseIntPipe()) maSanPham: number,
@@ -78,7 +91,8 @@ export class ProductController {
     }
 
     @Roles('NguoiBanHang')
-    @Post('restore')
+    @UseGuards(RolesGuard)
+    @Patch('restore')
     async RestoreProduct(
         @Body('MaSanPham', new ParseIntPipe()) maSanPham: number,
         @Session() session: Record<string, any>,
@@ -87,6 +101,7 @@ export class ProductController {
     }
 
     @Roles('NguoiBanHang')
+    @UseGuards(RolesGuard)
     @Delete('trashCan/delete')
     async DeleteProduct(
         @Body('MaSanPham', new ParseIntPipe()) maSanPham: number,
@@ -103,14 +118,16 @@ export class ProductController {
 
     // task 20/04/2024 đổ dữ liệu vào các ô cũ
     @Roles('NguoiBanHang')
+    @UseGuards(RolesGuard)
     @Get('change/:MaSanPham')
     async BeforeChangeProduct(@Param('MaSanPham') product: number, @Session() session: Record<string, any>) {
         const maNguoiBanHang = await session.user['payload'];
-        return this.productService.getInformationProduct(product, maNguoiBanHang);
+        return this.productService.getInformationProductDetail(product, maNguoiBanHang);
     }
 
     // thay đổi thông tin mới vào dữ liệu cũ
     @Roles('NguoiBanHang')
+    @UseGuards(RolesGuard)
     @Put('change')
     async AfterChangeProduct(
         @Body() ProductDTO,
