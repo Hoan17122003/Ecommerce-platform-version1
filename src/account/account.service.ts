@@ -12,14 +12,12 @@ import { NguoiMuaHangEntity, TaiKhoanEntity } from 'src/database/Entity/index.en
 import { TaiKhoanDTO } from './dto/account.dto';
 import { BaseService } from 'src/database/base.service';
 
-import { TaiKhoanRepository } from 'src/database/Repository/TaiKhoan.repository';
+import { AccountRepository, TaiKhoanRepository } from 'src/database/Repository/TaiKhoan.repository';
 import { BuyerDTO } from 'src/buyer/dto/buyer.dto';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { VenderService } from 'src/vender/vender.service';
 import { VenderDTO } from 'src/vender/dto/vender.dto';
-import { getProfile, findInformation, setRefreshToken } from 'src/database/Repository/TaiKhoan.repository';
 import { UserDTO } from './dto/user.dto';
-import { DEFAULT_EAGER_REFRESH_THRESHOLD_MILLIS } from 'google-auth-library/build/src/auth/authclient';
 import { LocalAuthGuard } from 'src/auth/guard/LocalAuth.guard';
 // import repository buyer and vender
 
@@ -27,19 +25,27 @@ import { LocalAuthGuard } from 'src/auth/guard/LocalAuth.guard';
     scope: Scope.REQUEST,
 })
 export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanRepository> {
+    taikhoanRepository: AccountRepository;
+
     constructor(
         @Inject('ACCOUNT_REPOSITORY') private readonly accountRepository: TaiKhoanRepository,
         @Inject('VENDER') private readonly venderService: VenderService,
         @Inject('BUYER') private readonly buyerService: BuyerService,
     ) {
         super(accountRepository);
+        this.taikhoanRepository = new AccountRepository();
     }
 
     async save(taikhoan: TaiKhoanDTO, user: UserDTO): Promise<TaiKhoanEntity> {
         try {
             // if (await findInformation(taikhoan.TenDangNhap, taikhoan.Email, SDT, taikhoan.VaiTro))
             //     throw new UnauthorizedException();
-            const data = await findInformation(taikhoan.TenDangNhap, taikhoan.Email, user.SDT, taikhoan.VaiTro);
+            const data = await this.taikhoanRepository.findInformation(
+                taikhoan.TenDangNhap,
+                taikhoan.Email,
+                user.SDT,
+                taikhoan.VaiTro,
+            );
             if (!data) throw new UnauthorizedException();
             const newTaiKhoan = new TaiKhoanEntity();
             newTaiKhoan.TenTaiKhoan = taikhoan.TenTaiKhoan;
@@ -75,9 +81,8 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
 
     async profile(id: number, vaitro: string): Promise<TaiKhoanEntity | null> {
         try {
-            const account = await getProfile(id, vaitro);
+            const account = await this.taikhoanRepository.getProfile(id, vaitro);
             return account;
-            // return this.accountRepository.findOneId(id);
         } catch (error) {
             throw Error(error);
         }
@@ -122,9 +127,8 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
         return user;
     }
 
-    async setRefreshToken(refreshToken: string, id: number) {
-        await setRefreshToken(refreshToken, id);
-        return;
+    setRefreshToken(refreshToken: string, id: number): void {
+        this.taikhoanRepository.setRefreshToken(refreshToken, id);
     }
 
     async findRefreshToken(refreshToken: string, taiKhoanId: number): Promise<boolean> {

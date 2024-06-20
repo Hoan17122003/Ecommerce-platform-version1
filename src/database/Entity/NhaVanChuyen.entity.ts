@@ -1,24 +1,23 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import { ChiTietNhaVanChuyen } from "./ChiTietNhaVanChuyen.entity";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { ChiTietNhaVanChuyen } from './ChiTietNhaVanChuyen.entity';
 
 @Entity('NhaVanChuyen')
 export class NhaVanChuyen {
     @PrimaryGeneratedColumn('identity')
-    MaNhaVanChuyen: number
+    MaNhaVanChuyen: number;
 
     @Column({
         type: 'nvarchar',
-        length: 50
+        length: 50,
     })
-    TenNhaVanChuyen: string
+    TenNhaVanChuyen: string;
 
     @Column({
         type: 'nvarchar',
         length: 20,
-        unique: true
+        unique: true,
     })
-    SDT: string
+    SDT: string;
 
-    @OneToMany(() => ChiTietNhaVanChuyen, chiTietNhaVanChuyen => chiTietNhaVanChuyen.nhaVanChuyen)
-    chitietnhavanchuyen: ChiTietNhaVanChuyen[]
+    chitietnhavanchuyen: ChiTietNhaVanChuyen[];
 }

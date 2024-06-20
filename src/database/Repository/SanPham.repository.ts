@@ -10,9 +10,10 @@ import {
 import { NguoiBanHangEntity, SanPhamEntity, TaiKhoanEntity } from '../Entity/index.entity';
 import { dataSource } from '../database.providers';
 import { ProductDTO } from 'src/product/dto/product/product.dto';
-import { KichThuocMauSacEntity } from '../Entity/KichThuocMauSac.entity';
-import { KichThuocMauSacDTO } from 'src/product/dto/kichthuocmausac/KichThuocMauSac.dto';
+import { ChiTietSanPhamEntity } from '../Entity/ChiTietSanPham.entity';
+import { ChiTietSanPhamDTO } from '../../product/dto/chitietsanpham/ChiTietSanPham.dto';
 import { NguoiBanHang } from '../Entity/NguoiBanHang.entity';
+import { ChiTietMaGiamGia } from '../Entity/ChiTietMaGiamGia.entity';
 
 // Hoàn ngày 17/04/2024 gửi Hoàn của tương lai đôi vài điều :
 // xin lỗi vì viết hiện tại t viết code như cái đặc cầu và comment cũng đéo chuẩn cái moẹ gì, logic thì phức tạp
@@ -24,7 +25,7 @@ export class SanPhamRepository extends Repository<SanPhamEntity> {}
 // create repository for logic business repository
 @EntityRepository(SanPhamEntity)
 export class ProductRepository {
-    public productRepository: Repository<SanPhamEntity>;
+    private productRepository: Repository<SanPhamEntity>;
 
     constructor() {
         const queryRunner = dataSource.createQueryRunner();
@@ -35,7 +36,7 @@ export class ProductRepository {
 
     public async findAll(): Promise<SanPhamEntity[]> {
         // console.log('product : ', await this.productRepository.createQueryBuilder().getMany());
-        console.log('hehehe');
+
         const data = await this.productRepository.find({
             select: {
                 TenSanPham: true,
@@ -45,8 +46,14 @@ export class ProductRepository {
                 ThuongHieu: true,
                 MaSanPham: true,
             },
+            order: {
+                TenSanPham: 'ASC',
+            },
+            relations: {
+                seller: true,
+            },
         });
-        return data;
+        return data ?? null;
     }
 
     public async softDelete(
@@ -74,38 +81,32 @@ export class ProductRepository {
         throw new Error('product in trash can');
     }
 
-    // chưa xử lý được nhiều phần tử con cùng 1 lúc
+    // chưa xử lý được nhiều phần tử con cùng 1 lúc => ngay 20/05/2024 đax fix đc lỗi
     public async addProduct(
         product: SanPhamEntity,
-        nguoiBanHang: NguoiBanHangEntity,
-        kichThuocMauSac: KichThuocMauSacDTO,
-    ): Promise<number | undefined> {
-        // const productId: number = await this.productRepository.query(`
-        // execute proc_themSanPham_NguoiBanHang
-        //     @MaNguoiBanHang = ${maNguoiBanHang},
-        //     @TenSanPham = N'${product.getTenSanPham()}',
-        //     @GiaBan = ${product.getGiaBan()},
-        //     @AnhSanPham = '${product.getAnhSanPham()}' ,
-        //     @MoTaSanPham = N'${product.getMoTaSanPham()}' ,
-        //     @ThuongHieu = N'${product.getThuongHieu()}',
-        //     @categoryId = N'A001'`);
+        ChiTietSanPham: ChiTietSanPhamDTO[] | ChiTietSanPhamDTO,
+    ): Promise<SanPhamEntity | undefined> {
+        // covert object to array
+        ChiTietSanPham = Object.keys(ChiTietSanPham).map(function (personNamedIndex) {
+            let person = ChiTietSanPham[personNamedIndex];
+            // do something with person
+            return person;
+        });
 
-        const productId: SanPhamEntity = await this.productRepository.save(product);
-        // const productId = await dataSource.getRepository(SanPhamEntity).insert(product).execute();
+        const productEntity: SanPhamEntity = await this.productRepository.save(product);
 
-        console.log('typeof product :', productId);
+        const ChiTietSanPhamRepository = await dataSource.getRepository(ChiTietSanPhamEntity);
+        for (let element of ChiTietSanPham) {
+            const chiTietSanPhamEntity = new ChiTietSanPhamEntity();
+            let SoLuong = Number(element.SoLuong);
+            chiTietSanPhamEntity.KichThuoc = element.KichThuoc;
+            chiTietSanPhamEntity.MauSac = element.MauSac;
+            chiTietSanPhamEntity.SoLuong = SoLuong;
+            chiTietSanPhamEntity.MaSanPham = productEntity.MaSanPham;
+            ChiTietSanPhamRepository.save(chiTietSanPhamEntity);
+        }
 
-        const kichthuocmausacEntity = new KichThuocMauSacEntity();
-        const kichthuocmausacRepository = await dataSource.getRepository(KichThuocMauSacEntity);
-        let SoLuong = Number(kichThuocMauSac.SoLuong);
-        kichthuocmausacEntity.KichThuoc = kichThuocMauSac.KichThuoc;
-        kichthuocmausacEntity.MauSac = kichThuocMauSac.MauSac;
-        kichthuocmausacEntity.SoLuong = SoLuong;
-        kichthuocmausacEntity.MaSanPham = productId.MaSanPham;
-        // const a = await kichthuocmausacRepository.create(kichthuocmausacEntity);
-        kichthuocmausacRepository.save(kichthuocmausacEntity);
-
-        return productId.MaSanPham;
+        return productEntity;
     }
 
     public async restore(
@@ -128,19 +129,44 @@ export class ProductRepository {
 
     public async findDelete(maSanPham: number, maNguoiBanHang: number): Promise<number> {
         try {
-            const data = await this.productRepository
-                .createQueryBuilder()
-                .delete()
-                .where('MaSanPham = :id', {
-                    id: maSanPham,
-                })
-                .andWhere('deletedDate is not null')
-                .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
-                    maNguoiBanHang,
-                })
-                .execute();
+            // xoá thông tin bảng liên kết trực tiếp với bảng sản phẩm
+            const ChiTietSanPham = await dataSource.getRepository(ChiTietSanPhamEntity);
 
-            return data.affected;
+            // xoá thông tin liên kết trực tiếp với bảng chi tiết mã giảm giá
+
+            const chiTietMaGiamGia = await dataSource.getRepository(ChiTietMaGiamGia);
+
+            const [ChiTietSanPhamflag, chitietmagiamFlag, productFlag] = await Promise.all([
+                ChiTietSanPham.createQueryBuilder()
+                    .delete()
+                    .where('MaSanPham = :id', {
+                        id: maSanPham,
+                    })
+                    .execute(),
+                chiTietMaGiamGia
+                    .createQueryBuilder()
+                    .delete()
+                    .where('MaSanPham = :maSanPham', {
+                        maSanPham,
+                    })
+                    .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
+                        maNguoiBanHang,
+                    })
+                    .execute(),
+                this.productRepository
+                    .createQueryBuilder()
+                    .delete()
+                    .where('MaSanPham = :id', {
+                        id: maSanPham,
+                    })
+                    .andWhere('deletedDate is not null')
+                    .andWhere('MaNguoiBanHang = :maNguoiBanHang', {
+                        maNguoiBanHang,
+                    })
+                    .execute(),
+            ]);
+
+            return productFlag.affected;
         } catch (error) {
             throw new Error(error);
         }
@@ -149,12 +175,12 @@ export class ProductRepository {
     // task 19/04
     public async ChangeInformationProduct(
         productDTO: ProductDTO,
-        kichThuocMauSacDTO: KichThuocMauSacDTO,
+        ChiTietSanPhamDTO: ChiTietSanPhamDTO,
         maNguoiBanHang: number,
     ): Promise<number> {
-        // const isKichThuocMauSac;
+        // const isChiTietSanPham;
         // const isProduct;
-        // const kichthuocmausacRepository = await dataSource.getRepository(KichThuocMauSacEntity);
+        // const ChiTietSanPhamRepository = await dataSource.getRepository(ChiTietSanPhamEntity);
 
         // await Promise.all([
         //     this.productRepository
@@ -167,14 +193,14 @@ export class ProductRepository {
         //             maNguoiBanHang,
         //         })
         //         .execute(),
-        //     kichthuocmausacRepository.createQueryBuilder().update().set({}),
+        //     ChiTietSanPhamRepository.createQueryBuilder().update().set({}),
         // ]);
         return 1;
     }
     public async InformationProduct(
         ProductId: number,
         maNguoiBanHang: number,
-    ): Promise<{ SanPhamEntity; KichThuocMauSacEntity }> {
+    ): Promise<{ SanPhamEntity; ChiTietSanPhamEntity }> {
         const sanpham = await this.productRepository.findOne({
             select: {
                 TenSanPham: true,
@@ -187,20 +213,31 @@ export class ProductRepository {
                 MaSanPham: ProductId,
             },
         });
-        const kichthuocmausacRepository = await dataSource.getRepository(KichThuocMauSacEntity);
+        const ChiTietSanPhamRepository = await dataSource.getRepository(ChiTietSanPhamEntity);
 
-        const kichthuocmausac = await kichthuocmausacRepository
-            .createQueryBuilder()
+        const ChiTietSanPham = await ChiTietSanPhamRepository.createQueryBuilder()
             .where('MaSanPham = :ProductId', {
                 ProductId,
             })
             .getMany();
-        console.log('kichthuocmausac : ', kichthuocmausac);
+        console.log('ChiTietSanPham : ', ChiTietSanPham);
         console.log('SanPham : ', sanpham);
 
         return {
             SanPhamEntity: sanpham,
-            KichThuocMauSacEntity: kichthuocmausac,
+            ChiTietSanPhamEntity: ChiTietSanPham,
         };
+    }
+    updatePrice(productId: number, newPrice: number) {
+        return this.productRepository
+            .createQueryBuilder()
+            .update()
+            .set({
+                GiaBan: newPrice,
+            })
+            .where('MaSanPham = :productId', {
+                productId,
+            })
+            .execute();
     }
 }

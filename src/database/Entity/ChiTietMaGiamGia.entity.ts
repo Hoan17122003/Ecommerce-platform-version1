@@ -15,20 +15,33 @@ import { MaGiamGia } from './MaGiamGia.entity';
 
 @Entity('ChiTietMaGiamGia')
 export class ChiTietMaGiamGia extends BaseEntity {
-    @PrimaryGeneratedColumn('identity')
-    chiTietMaGiamGiaId: number;
+    // @PrimaryGeneratedColumn('identity')
+    // chiTietMaGiamGiaId: number;
 
-    @ManyToOne(() => Product, (product) => product.chitietmagiamgia)
-    product: Product;
+    @PrimaryColumn({
+        type: 'int',
+        name: 'MaSanPham',
+    })
+    // @Column({ type: 'int', name: 'MaSanPham' })
+    // @ManyToOne(() => Product, (product) => product.chitietmagiamgia)
+    product: number;
 
-    @ManyToOne(() => MaGiamGia, (maGiamGia) => maGiamGia.chitietmagiamgia)
-    MaGiamGiaId: MaGiamGia;
+    @PrimaryColumn({
+        type: 'int',
+        name: 'MaGiamGiaId',
+    })
+    // @Column({ type: 'int' })
+    // @ManyToOne(() => MaGiamGia, (maGiamGia) => maGiamGia.chitietmagiamgia)
+    MaGiamGiaId: number;
 
-    @ManyToOne(() => NguoiBanHang, (nguoiBanHang) => nguoiBanHang.chiTietMaGiamGia)
-    nguoiBanHang: NguoiBanHang;
+    @Column({
+        type: 'int',
+        name: 'MaNguoiBanHang',
+    })
+    nguoiBanHang: number;
 
     @Column({
         type: 'int',
     })
-    SoLuongSanPhamKhuyenMai: number;
+    SoLuongMaGiamGia: number;
 }

@@ -14,6 +14,7 @@ import {
     Query,
     Patch,
 } from '@nestjs/common';
+import { interval, map, Observable, of } from 'rxjs';
 
 import { ProductService } from './product.service';
 import { Public } from 'src/decorators/auth.decorators';
@@ -21,19 +22,20 @@ import { JwtAccessTokenGuard } from 'src/auth/guard/JwtAccessAuth.guard';
 import { ProductDTO } from './dto/product/product.dto';
 import { Roles } from 'src/decorators/role.decoratos';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
-import { session } from 'passport';
-import { KichThuocMauSacDTO } from './dto/kichthuocmausac/KichThuocMauSac.dto';
+import { ChiTietSanPhamDTO } from './dto/ChiTietSanPham/ChiTietSanPham.dto';
 import { ProductInner } from './dto/product/ProductInner';
-import { KichThuocMauSacInner } from './dto/kichthuocmausac/KichThuocMauSacInner';
 import { dataSource } from 'src/database/database.providers';
-import { NguoiBanHangEntity } from 'src/database/Entity/index.entity';
+import { NguoiBanHangEntity, NguoiMuaHangEntity, SanPhamEntity } from 'src/database/Entity/index.entity';
 import { UserRole } from 'src/account/enums/role.enum';
-
 // @UseGuards(RolesGuard)
+
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Product')
 export class ProductController {
-    constructor(private readonly productService: ProductService) {}
+    constructor(
+        private readonly productService: ProductService,
+        // private readonly primusService: PrimusService,
+    ) {}
 
     @Public()
     @Get()
@@ -47,22 +49,44 @@ export class ProductController {
     async CreateProduct(
         @Body()
         productDTO: ProductDTO,
-        @Body() kichthuocmausac: KichThuocMauSacDTO,
+        @Body('ChiTietSanPham') ChiTietSanPham: ChiTietSanPhamDTO | ChiTietSanPhamDTO[],
         @Session() session: Record<any, string>,
     ) {
+        const products: SanPhamEntity[] = await this.AllProduct();
+        let state = false;
+
+        console.log('productdto : ', productDTO);
+        if (products.length > 0) {
+            let leftPos = 0;
+            let rightPost = products.length - 1;
+            console.log(products.length, rightPost);
+            while (leftPos < rightPost) {
+                let mid = Math.floor((leftPos + rightPost) / 2);
+                console.log('mid : ', mid);
+                console.log('hehehe : ', products[mid].TenSanPham);
+                if (productDTO.TenSanPham >= products[mid].TenSanPham) {
+                    leftPos = mid;
+                } else {
+                    rightPost = mid;
+                }
+                if (productDTO.TenSanPham === products[mid].TenSanPham) {
+                    state = true;
+                }
+            }
+        }
+
+        if (state) throw new ForbiddenException('Tên sản phẩm đã tồn tại');
+
         const product: ProductDTO = new ProductInner()
             .setTenSanPham(productDTO.TenSanPham)
             .setAnhSanPham(productDTO.AnhSanPham)
             .setGiaBan(productDTO.GiaBan)
             .setThuongHieu(productDTO.ThuongHieu)
             .setMoTaSanPham(productDTO.MoTaSanPham)
+            .setCategoty(productDTO.CategoryId)
             .Build();
-        const kichThuocMauSac: KichThuocMauSacDTO = new KichThuocMauSacInner()
-            .setKichThuoc(kichthuocmausac.KichThuoc)
-            .setMauSac(kichthuocmausac.MauSac)
-            .setSoLuong(kichthuocmausac.SoLuong)
-            .Build();
-        console.log('typeof : ', typeof kichthuocmausac.SoLuong);
+
+        // console.log('typeof : ', typeof ChiTietSanPham.SoLuong);
 
         try {
             const maNguoiBanHang = await session.user['payload'];
@@ -74,7 +98,7 @@ export class ProductController {
                 })
                 .getOne();
 
-            return this.productService.create(product, nguoiBanHang, maNguoiBanHang, kichThuocMauSac);
+            return this.productService.create(product, ChiTietSanPham, nguoiBanHang);
         } catch (error) {
             throw new ForbiddenException(error);
         }
@@ -90,7 +114,7 @@ export class ProductController {
         return this.productService.remove(maSanPham, session.user['payload']);
     }
 
-    @Roles('NguoiBanHang')
+    @Roles(UserRole.NguoiBanHang)
     @UseGuards(RolesGuard)
     @Patch('restore')
     async RestoreProduct(
@@ -131,17 +155,14 @@ export class ProductController {
     @Put('change')
     async AfterChangeProduct(
         @Body() ProductDTO,
-        @Body() kichThuocMauSacDTO: KichThuocMauSacDTO,
+        @Body() ChiTietSanPhamDTO: ChiTietSanPhamDTO,
         @Session() session: Record<string, any>,
     ) {
         try {
             const maNguoiBanHang = session.user['payload'];
-            return this.productService.ChangeInformationProduct(ProductDTO, kichThuocMauSacDTO, maNguoiBanHang);
+            return this.productService.ChangeInformationProduct(ProductDTO, ChiTietSanPhamDTO, maNguoiBanHang);
         } catch (error) {}
     }
 
-    // @Get('store/:MaNguoiBanHang')
-    // async store() {
-    //     return
-    // }
+    //buy product for buyer
 }

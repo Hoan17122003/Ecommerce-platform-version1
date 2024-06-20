@@ -7,6 +7,7 @@ export class ProductInner implements ProductBuilder {
     private AnhSanPham: string;
     private MoTaSanPham: string;
     private ThuongHieu: string;
+    private categoty: string;
 
     public setAnhSanPham(anhSanPham: string): ProductBuilder {
         this.AnhSanPham = anhSanPham;
@@ -29,7 +30,19 @@ export class ProductInner implements ProductBuilder {
         this.MoTaSanPham = moTa;
         return this;
     }
+    public setCategoty(categoty: string): ProductBuilder {
+        this.categoty = categoty;
+        return this;
+    }
+
     public Build(): ProductDTO {
-        return new ProductDTO(this.TenSanPham, this.GiaBan, this.AnhSanPham, this.MoTaSanPham, this.ThuongHieu);
+        return new ProductDTO(
+            this.TenSanPham,
+            this.GiaBan,
+            this.AnhSanPham,
+            this.MoTaSanPham,
+            this.ThuongHieu,
+            this.categoty,
+        );
     }
 }

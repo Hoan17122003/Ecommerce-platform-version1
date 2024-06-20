@@ -4,7 +4,9 @@ import { NguoiBanHang } from './NguoiBanHang.entity';
 
 @Entity('ViNguoiDung')
 export class ViNguoiDung {
-    @PrimaryGeneratedColumn('identity')
+    @PrimaryGeneratedColumn('identity', {
+        name: 'MaViNguoiDung',
+    })
     MaViNguoiDung: number;
 
     @Column({
@@ -18,4 +20,8 @@ export class ViNguoiDung {
         length: 100,
     })
     TenNganHangLienKet: string;
+
+    @OneToOne(() => NguoiBanHang)
+    @JoinColumn()
+    nguoiBanHang: NguoiBanHang;
 }

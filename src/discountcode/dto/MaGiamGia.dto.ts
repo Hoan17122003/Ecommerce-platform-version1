@@ -1,19 +1,34 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { LoaiGiamGiaEnum } from '../enums/LoaiGiamGia.enum';
 
 export class MaGiamGiaDTO {
     @IsNotEmpty()
     @IsString()
-    @IsEnum(['mĩ phẩm,quần áo, đồ điện tử, đồ gia dụng'])
-    readonly LoaiGiamGia: string;
+    @IsEnum(LoaiGiamGiaEnum)
+    LoaiGiamGia: string;
     @IsNotEmpty()
-    readonly ThoiGianBatDau: Date;
+    @IsDate()
+    ThoiGianBatDau: Date;
     @IsNotEmpty()
-    readonly ThoiGianKetThuc: Date;
+    @IsDate()
+    ThoiGianKetThuc: Date;
     @IsNotEmpty()
     @IsNumber()
-    readonly SoLuongSanPham: number;
+    SoLuongSanPham: number;
 
     @IsNotEmpty()
     @IsNumber()
-    readonly discount: number;
+    discount: number;
+
+    constructor(LoaiGiamGia: string, ThoiGianBatDau: string, ThoiGianKetThuc: string, discount: number) {
+        const thoiGianBatDau = new Date(ThoiGianBatDau);
+        const thoiGianKetThuc = new Date(ThoiGianKetThuc);
+        console.log('thoigianbatdau : ', thoiGianBatDau);
+        console.log('thoigianketthuc : ', thoiGianKetThuc);
+
+        this.LoaiGiamGia = LoaiGiamGia;
+        this.ThoiGianBatDau = thoiGianBatDau;
+        this.ThoiGianKetThuc = thoiGianKetThuc;
+        this.discount = discount;
+    }
 }

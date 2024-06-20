@@ -12,24 +12,19 @@ import { DiscountCodeService } from 'src/discountcode/discountcode.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { DiscountCodeDetailModule } from 'src/discountcodedetail/discountcodedetail.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
     imports: [
         DatabaseModule,
-        ProductModule,
-        DiscountCodeModule,
         JwtModule.register({}),
+        ProductModule,
         AuthModule,
+        DiscountCodeModule,
         DiscountCodeDetailModule,
+        RedisModule,
     ],
-    providers: [
-        unknowProviders('NGUOIBANHANG_REPOSITORY', NguoiBanHangEntity),
-        VenderService,
-        // ProductService,
-        // DiscountCodeService,
-        JwtService,
-        AuthModule,
-    ],
+    providers: [unknowProviders('NGUOIBANHANG_REPOSITORY', NguoiBanHangEntity), VenderService, JwtService, AuthModule],
     controllers: [VenderController],
     exports: [VenderModule],
 })

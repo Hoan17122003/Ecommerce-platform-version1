@@ -6,5 +6,6 @@ export interface ProductBuilder {
     setAnhSanPham(anhSanPham: string): ProductBuilder;
     setMoTaSanPham(moTa: string): ProductBuilder;
     setThuongHieu(thuongHieu: string): ProductBuilder;
+    setCategoty(categoty: string): ProductBuilder;
     Build(): ProductDTO;
 }

@@ -22,6 +22,8 @@ export class RolesGuard implements CanActivate {
         if (isPublic) return true;
         const request = context.switchToHttp().getRequest();
         const vaitro = this.authService.findById(request.session.user.payload);
-        return roles.includes((await vaitro).VaiTro);
+        const check = roles.includes((await vaitro).VaiTro);
+        console.log('check : ', check);
+        return check;
     }
 }

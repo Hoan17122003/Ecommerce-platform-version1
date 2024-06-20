@@ -1,30 +1,28 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from "typeorm";
-import { DonHang } from "./DonHang.entity";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from 'typeorm';
+import { DonHang } from './DonHang.entity';
 
 @Entity('ThanhToan')
 export class ThanhToan {
     @PrimaryGeneratedColumn('identity')
-    MaThanhToan: number
+    MaThanhToan: number;
 
     @Column({
         type: 'nvarchar',
         length: 50,
     })
-    HinhThucThanhToan: string
+    HinhThucThanhToan: string;
 
     @Column({
-        type: 'bit'
+        type: 'bit',
     })
-    TrangThaiThanhToan: number
+    TrangThaiThanhToan: number;
 
     @CreateDateColumn({
         type: 'datetime',
         name: 'ThoiGianThanhToan',
-        default: Date.now()
+        default: Date.now(),
     })
-    ThoiGianThanhToan: Date
+    ThoiGianThanhToan: Date;
 
     // one to many donhang
-    @ManyToOne(() => DonHang, donHang => donHang.thanhToan)
-    donHang: DonHang
 }

@@ -20,12 +20,25 @@ export class ProductDTO {
     @IsString()
     @IsNotEmpty()
     ThuongHieu: string;
-    constructor(TenSanPham: string, GiaBan: number, AnhSanPham: string, MoTaSanPham: string, ThuongHieu: string) {
+
+    @IsString()
+    @IsNotEmpty()
+    CategoryId: string;
+
+    constructor(
+        TenSanPham: string,
+        GiaBan: number,
+        AnhSanPham: string,
+        MoTaSanPham: string,
+        ThuongHieu: string,
+        CategoryId: string,
+    ) {
         this.TenSanPham = TenSanPham;
         this.GiaBan = GiaBan;
         this.AnhSanPham = AnhSanPham;
         this.MoTaSanPham = MoTaSanPham;
         this.ThuongHieu = ThuongHieu;
+        this.CategoryId = CategoryId;
     }
 
     setTenSanPham(tenSanPham: string) {
@@ -43,5 +56,8 @@ export class ProductDTO {
     }
     setThuongHieu(thuongHieu: string) {
         this.ThuongHieu = thuongHieu;
+    }
+    setCategory(categoryId: string) {
+        this.CategoryId = categoryId;
     }
 }

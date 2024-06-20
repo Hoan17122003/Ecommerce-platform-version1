@@ -1,27 +1,22 @@
-import { Entity, Column, OneToMany, ManyToOne, PrimaryGeneratedColumn, PrimaryColumn } from "typeorm";
-import { DonHang } from "./DonHang.entity";
-import { NhaVanChuyen } from "./NhaVanChuyen.entity";
+import { Entity, Column, OneToMany, ManyToOne, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+import { DonHang } from './DonHang.entity';
+import { NhaVanChuyen } from './NhaVanChuyen.entity';
 
 @Entity('ChiTietNhaVanChuyen')
 export class ChiTietNhaVanChuyen {
-
     @PrimaryGeneratedColumn('identity')
-    chiTietNhaVanChuyenId: number
+    chiTietNhaVanChuyenId: number;
 
     @Column({
-        type: 'money'
+        type: 'money',
     })
-    ChiPhiVanChuyen: number
-    @ManyToOne(() => DonHang, donHang => donHang.chitietnhavanchuyen)
-    @PrimaryColumn({
-        type: 'int'
-    })
-    donHang: DonHang
+    ChiPhiVanChuyen: number;
 
-    @ManyToOne(() => NhaVanChuyen, nhaVanChuyen => nhaVanChuyen.chitietnhavanchuyen)
-    @PrimaryColumn({
-        type: 'int'
-    })
-    nhaVanChuyen: NhaVanChuyen
+    donHang: DonHang;
 
+    @ManyToOne(() => NhaVanChuyen, (nhaVanChuyen) => nhaVanChuyen.chitietnhavanchuyen)
+    @PrimaryColumn({
+        type: 'int',
+    })
+    nhaVanChuyen: NhaVanChuyen;
 }

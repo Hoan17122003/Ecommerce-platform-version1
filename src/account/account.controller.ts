@@ -66,7 +66,7 @@ export class AccountController {
             subject: 'Welcome to web-ecommerce! Confirm your Email',
             content: validateToken,
         });
-        return validateToken;
+        return {validateToken};
     }
 
     // gọi cập nhật trạng thái tài khoản

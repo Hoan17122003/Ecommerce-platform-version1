@@ -1,4 +1,4 @@
 export enum UserRole {
-    NguoiMuaHang = 'NGUOIMUAHANG',
-    NguoiBanHang = 'NGUOIBANHANG',
+    NguoiMuaHang = 'NguoiMuaHang',
+    NguoiBanHang = 'NguoiBanHang',
 }

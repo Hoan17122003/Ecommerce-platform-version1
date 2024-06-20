@@ -9,6 +9,8 @@ import {
     ManyToOne,
     PrimaryColumn,
 } from 'typeorm';
+import { Expose } from 'class-transformer';
+
 import { TaiKhoan } from './TaiKhoan.entity';
 import { Chat } from './Chat.entity';
 import { DonHang } from './DonHang.entity';
@@ -51,15 +53,15 @@ export class NguoiMuaHang extends BaseEntity {
     })
     NgayThangNamSinh: Date;
 
-    @OneToMany(() => Chat, (chat) => chat.nguoiMuaHang)
     chats: Chat[];
 
-    @OneToMany(() => DonHang, (donHang) => donHang.nguoiMuaHang)
     donHang: DonHang[];
 
-    @OneToMany(() => BinhLuanDanhGia, (binhLuanDanhGia) => binhLuanDanhGia.nguoiMuaHang)
     binhLuanDanhGia: BinhLuanDanhGia[];
 
-    @OneToOne(() => ViNguoiDung)
     viNguoiDung: ViNguoiDung;
+
+    get fullName() {
+        return `${this.HoDem} ${this.Ten}`;
+    }
 }

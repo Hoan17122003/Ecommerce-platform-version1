@@ -8,6 +8,8 @@ import {
     BaseEntity,
     ManyToOne,
     PrimaryColumn,
+    ManyToMany,
+    JoinTable,
 } from 'typeorm';
 
 import { TaiKhoan } from './TaiKhoan.entity';
@@ -16,11 +18,13 @@ import { DonHang } from './DonHang.entity';
 import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
 import { ViNguoiDung } from './ViNguoiDung.entity';
 import { SanPhamEntity, TaiKhoanEntity } from './index.entity';
+import { MaGiamGia } from './MaGiamGia.entity';
 
 @Entity('NguoiBanHang')
 export class NguoiBanHang extends BaseEntity {
     @PrimaryColumn({
         type: 'int',
+        name: 'MaNguoiBanHang',
     })
     // @OneToOne(() => TaiKhoan)
     // @JoinColumn()
@@ -56,18 +60,17 @@ export class NguoiBanHang extends BaseEntity {
     })
     DiaChi: string;
 
-    @OneToMany(() => Chat, (chat) => chat.nguoiBanHang)
-    chats: Chat[];
+    chats: Chat;
 
-    @OneToMany(() => DonHang, (donHang) => donHang.nguoiBanHang)
-    donHang: DonHang[];
+    // @ManyToMany(() => SanPhamEntity)
+    // @JoinTable()
+    // chiTietMaGiamGia: ChiTietMaGiamGia[];
 
-    // @OneToMany(() => SanPhamEntity, (sanPham) => sanPham.nguoibanhang)
-    // sanPham: SanPhamEntity[];
+    @OneToMany(() => SanPhamEntity, (sanpham) => sanpham.seller)
+    @JoinColumn({ name: 'MaSanPham' })
+    SanPham: SanPhamEntity[];
 
-    @OneToMany(() => ChiTietMaGiamGia, (chiTietMaGiamGia) => chiTietMaGiamGia.nguoiBanHang)
-    chiTietMaGiamGia: ChiTietMaGiamGia[];
-
-    @OneToOne(() => ViNguoiDung)
-    viNguoiDung: ViNguoiDung;
+    // @OneToOne(() => ViNguoiDung, (vinguoidung) => vinguoidung.nguoiBanHang)
+    // @JoinColumn({ name: 'MaViNguoiDung' })
+    // viNguoiDung: ViNguoiDung;
 }

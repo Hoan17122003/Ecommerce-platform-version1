@@ -3,11 +3,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import * as session from 'express-session';
+// import { NestMicroserviceOptions } from '@nestjs/common/interfaces/microservices/nest-microservice-options.interface';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 dotenv.config({ path: 'local.env' });
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    app.enableCors();
 
     app.use(
         session({
@@ -21,8 +24,8 @@ async function bootstrap() {
     );
     app.useGlobalPipes(new ValidationPipe());
 
-    await app.listen(process.env.PORT, () => {
-        console.log(`server listening on port ${process.env.PORT}`);
+    app.listen(process.env.PORT, () => {
+        console.log(`server listen on port ${process.env.PORT}`);
     });
 }
 bootstrap();

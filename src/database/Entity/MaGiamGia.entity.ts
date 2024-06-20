@@ -3,13 +3,13 @@ import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
 
 @Entity('MaGiamGIa')
 export class MaGiamGia extends BaseEntity {
-    @PrimaryGeneratedColumn('identity')
+    @PrimaryGeneratedColumn('increment')
     MaGiamGiaId: number;
 
     @Column({
         type: 'nvarchar',
         length: 50,
-        enum: ['Trang Phục , Điện tử, Thực phẩm, Gia Dụng'],
+        enum: ['áp đặt', 'lựa chọn'],
     })
     LoaiGiamGia: string;
     @Column({
@@ -19,6 +19,7 @@ export class MaGiamGia extends BaseEntity {
     ThoiGianBatDau: Date;
     @Column({
         type: 'datetime',
+        default: 'getdate()',
     })
     ThoiGianKetThuc: Date;
     @Column({
@@ -26,6 +27,12 @@ export class MaGiamGia extends BaseEntity {
         default: 0,
     })
     discount: number;
-    @OneToMany(() => ChiTietMaGiamGia, (chiTietMaGiamGia) => chiTietMaGiamGia.MaGiamGiaId)
+
+    @Column({
+        type: 'bit',
+        default: 0,
+    })
+    isActive: number;
+
     chitietmagiamgia: ChiTietMaGiamGia[];
 }

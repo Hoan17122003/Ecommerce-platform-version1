@@ -1,35 +1,36 @@
-import { BaseEntity, Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from "typeorm";
+import { BaseEntity, Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
-import { Product } from "./SanPham.entity";
-import { NguoiMuaHang } from "./NguoiMuaHang.entity";
+import { Product } from './SanPham.entity';
+import { NguoiMuaHang } from './NguoiMuaHang.entity';
 
 @Entity('BinhLuanDanhGia')
 export class BinhLuanDanhGia extends BaseEntity {
     @PrimaryGeneratedColumn('identity')
-    MaBinhLLuanDanhGia: number
+    MaBinhLLuanDanhGia: number;
 
     @Column({
         type: 'nvarchar',
         length: 20,
-        name: 'type'
+        name: 'type',
     })
-    Kieu: string
+    Kieu: string;
 
     @Column({
         type: 'nvarchar',
         length: 500,
     })
-    NoiDung: string
+    NoiDung: string;
 
     @Column({
         type: 'int',
-        nullable: true
+        nullable: true,
     })
-    ChiSoDanhGia: number
+    ChiSoDanhGia: number;
 
-    @ManyToOne(() => Product, product => product.binhLuanDanhGia)
-    product: Product
+    @ManyToOne(() => Product)
+    @JoinColumn({ name: 'MaSanPham' })
+    product: Product;
 
-    @ManyToOne(() => NguoiMuaHang, nguoiMuaHang => nguoiMuaHang.binhLuanDanhGia)
-    nguoiMuaHang: NguoiMuaHang
+    @ManyToOne(() => NguoiMuaHang, (nguoiMuaHang) => nguoiMuaHang.binhLuanDanhGia)
+    nguoiMuaHang: NguoiMuaHang;
 }

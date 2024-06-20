@@ -1,10 +1,21 @@
-import { BaseEntity, Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    BaseEntity,
+    Column,
+    DeleteDateColumn,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BinhLuanDanhGia } from './BinhLuanDanhGia.entity';
 import { ChiTietDonHang } from './ChiTietDonHang.entity';
 import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
-import { KichThuocMauSacEntity } from './KichThuocMauSac.entity';
-import { NguoiBanHangEntity } from './index.entity';
 import { NguoiBanHang } from './NguoiBanHang.entity';
+import { Categories } from './categories.entity';
+import { DonHangEntity } from './index.entity';
 
 @Entity('SanPham')
 export class Product extends BaseEntity {
@@ -14,6 +25,7 @@ export class Product extends BaseEntity {
         AnhSanPham: string,
         MoTaSanPham: string,
         ThuongHieu: string,
+        category: string,
         // nguoibanhang: NguoiBanHangEntity,
     ) {
         super();
@@ -22,13 +34,13 @@ export class Product extends BaseEntity {
         this.AnhSanPham = AnhSanPham;
         this.MoTaSanPham = MoTaSanPham;
         this.ThuongHieu = ThuongHieu;
-        // this.nguoibanhang = nguoibanhang;
-        this.binhLuanDanhGia = null;
-        this.orderDetail = null;
-        this.chitietmagiamgia = null;
+        this.categoryId = category;
     }
 
-    @PrimaryGeneratedColumn('identity')
+    @PrimaryGeneratedColumn({
+        type: 'int',
+        name: 'MaSanPham',
+    })
     MaSanPham: number;
 
     @Column({
@@ -60,23 +72,41 @@ export class Product extends BaseEntity {
     })
     ThuongHieu: string;
 
-    @OneToMany(() => BinhLuanDanhGia, (binhLuanDanhGia) => binhLuanDanhGia.product)
+    @Column({
+        type: 'nvarchar',
+        length: 50,
+    })
+    categoryId: string;
+
+    @OneToMany(() => BinhLuanDanhGia, (binhluandanhgia) => binhluandanhgia.product)
+    @JoinColumn({ name: 'MaBinhLuanDanhGia' })
     binhLuanDanhGia: BinhLuanDanhGia[];
 
-    @OneToMany(() => ChiTietDonHang, (chiTietDonHang) => chiTietDonHang.product)
+    @ManyToOne(() => Categories)
+    @JoinColumn({
+        name: 'categoryId',
+    })
+    category: Categories;
+
+    @OneToMany(() => ChiTietDonHang, (chitietdonhang) => chitietdonhang.sanpham)
+    @JoinColumn({
+        name: 'MaSanPham',
+    })
     orderDetail: ChiTietDonHang[];
 
-    @OneToMany(() => ChiTietMaGiamGia, (chiTietMaGiamGia) => chiTietMaGiamGia.product)
-    chitietmagiamgia: ChiTietMaGiamGia[];
+    @ManyToOne(() => NguoiBanHang)
+    @JoinColumn({ name: 'MaNguoiBanHang' })
+    seller: NguoiBanHang;
 
     @Column({
         type: 'int',
         name: 'MaNguoiBanHang',
     })
-    nguoibanhang: number;
+    Manguoibanhang: number;
 
-    // @ManyToOne(() => NguoiBanHangEntity, nguoiBanHang => nguoiBanHang.sanPham)
-    // nguoiBanHang: NguoiBanHang;
+    // @ManyToMany(() => DonHangEntity)
+    // @JoinTable()
+    // donHang: DonHangEntity;
 
     @DeleteDateColumn({
         default: null,

@@ -21,10 +21,8 @@ export class JwtAccessTokenGuard implements CanActivate {
         ]);
         if (isPublic) return true;
 
-        console.log('1...');
         const request = context.switchToHttp().getRequest();
-        // const token = this.extractTokenFromHeader(request);
-        const token = request.rawHeaders[1].slice(7);
+        const token = this.extractTokenFromHeader(request);
         if (!token) throw new ForbiddenException();
         request.session.token = token;
         try {
@@ -44,7 +42,7 @@ export class JwtAccessTokenGuard implements CanActivate {
     }
 
     private extractTokenFromHeader(request: Request): string | undefined {
-        const [type, token] = request.headers['Authorization']?.split(' ') ?? [];
+        const [type, token] = request.headers['authorization']?.split(' ') ?? [];
         return type === 'Bearer' ? token : undefined;
     }
 }

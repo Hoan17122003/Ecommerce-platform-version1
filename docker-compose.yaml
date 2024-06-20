@@ -16,22 +16,19 @@
 
 
   # Explicitly specify a supported version 
-services:
-  dev-database:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: my-sql-server
-    environment:
-      - SA_PASSWORD_FILE=/run/secrets/123  # Use a secret for password
-      - ACCEPT_EULA=Y
-      - database=testdb
-    ports:
-      - "1435:1433"
-    networks:
-      - backend-network
 
-networks:
-  backend-network:
-    driver: bridge
+
+
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6380:6380"
+    volumes:
+      - ./data:/data
+    
 
 
   # pssql:

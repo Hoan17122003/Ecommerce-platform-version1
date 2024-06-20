@@ -1,43 +1,82 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm'
-import { NguoiBanHang } from './NguoiBanHang.entity'
-import { NguoiMuaHang } from './NguoiMuaHang.entity'
-import { ChiTietNhaVanChuyen } from './ChiTietNhaVanChuyen.entity'
-import { ChiTietDonHang } from './ChiTietDonHang.entity'
-import { ThanhToan } from './ThanhToan.entity'
-
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, BaseEntity, JoinColumn } from 'typeorm';
+import { NguoiBanHang } from './NguoiBanHang.entity';
+import { NguoiMuaHang } from './NguoiMuaHang.entity';
+import { ChiTietNhaVanChuyen } from './ChiTietNhaVanChuyen.entity';
+import { ChiTietDonHang } from './ChiTietDonHang.entity';
+import { ThanhToan } from './ThanhToan.entity';
 
 @Entity('DonHang')
-export class DonHang {
-    @PrimaryGeneratedColumn('identity')
-    MaDonHang: number
-
-    @Column({
-        type: 'datetime',
-        default: 'getdate()'
+export class DonHang extends BaseEntity {
+    @PrimaryGeneratedColumn({
+        type: 'int',
+        name: 'MaDonHang',
     })
-    ThoiGianLap: Date
+    MaDonHang: number;
 
     @Column({
         type: 'int',
-        default: 0
+        default: 0,
     })
-    TrangThaiDonHang: number
+    TrangThaiDonHang: number;
 
-    @ManyToOne(() => NguoiBanHang, nguoiBanHang => nguoiBanHang.donHang)
-    nguoiBanHang: NguoiBanHang
+    @Column({
+        type: 'int',
+    })
+    MaNguoiBanHang: number;
 
-    @ManyToOne(() => NguoiMuaHang, nguoiMuaHang => nguoiMuaHang.donHang)
-    nguoiMuaHang: NguoiMuaHang
+    @Column({
+        type: 'int',
+    })
+    MaNguoiMuaHang: number;
 
-    @OneToMany(() => ChiTietNhaVanChuyen, chiTietNhaVanChuyen => chiTietNhaVanChuyen.donHang)
-    chitietnhavanchuyen: ChiTietNhaVanChuyen[]
+    @Column({
+        type: 'datetime',
+        default: new Date(Date.now().toLocaleString('vi')),
+    })
+    NgayDatHang: Date;
 
-    @OneToMany(() => ChiTietDonHang, chiTietDonHang => chiTietDonHang.donHang)
-    orderDetail: ChiTietDonHang[]
+    @Column({
+        type: 'int',
+    })
+    discount: number;
 
-    @OneToMany(() => ThanhToan, thanhToan => thanhToan.donHang)
-    thanhToan: ThanhToan[]
+    @Column({
+        type: 'text',
+        name: 'DiaChi',
+    })
+    diaChi: string;
 
+    @Column({
+        type: 'nvarchar',
+        length: 20,
+        name: 'PhuongThucThanhToan',
+    })
+    phuongThucThanhToan: string;
 
+    @OneToMany(() => ChiTietDonHang, (chitieitdonhang) => chitieitdonhang.donhang)
+    @JoinColumn({ name: 'MaDonHang' })
+    chitietdonhang: ChiTietDonHang[];
 
+    constructor(
+        MaNguoiBanHang: number,
+        MaNguoiMuaHang: number,
+        discount: number,
+        diaChi: string,
+        phuongThucThanhToan: string,
+    ) {
+        super();
+        this.MaNguoiBanHang = MaNguoiBanHang;
+        this.MaNguoiMuaHang = MaNguoiMuaHang;
+        this.discount = discount;
+        this.TrangThaiDonHang = 0;
+        this.phuongThucThanhToan = phuongThucThanhToan;
+        this.diaChi = diaChi;
+        //
+        const getnow = new Date(Date.now()).toLocaleString('vi');
+        const formater = getnow.split(' ');
+        const stringNow = `${formater[1]}T${formater[0]}`;
+        const now = new Date(Date.apply(stringNow));
+        now.setHours(now.getHours() - 7);
+        this.NgayDatHang = now;
+    }
 }
