@@ -80,12 +80,18 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
     }
 
     async profile(id: number, vaitro: string): Promise<TaiKhoanEntity | null> {
+        let result = null;
         try {
-            const account = await this.taikhoanRepository.getProfile(id, vaitro);
-            return account;
+            if (vaitro.toLocaleLowerCase() === 'nguoimuahang') {
+                result = await this.buyerService.getProfile(id);
+            } else if (vaitro.toLocaleLowerCase() === 'nguoibanhang') {
+                result = await this.venderService.getProfile(id);
+            }
         } catch (error) {
             throw Error(error);
         }
+
+        return result;
     }
 
     async changeInformation(
@@ -104,7 +110,7 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
     async find(tenDangNhap: string) {
         return this.accountRepository.findOne({
             select: {
-                TaiKhoanId: true,
+                taiKhoanId: true,
                 TenTaiKhoan: true,
                 MatKhau: true,
             },
@@ -114,14 +120,14 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
         });
     }
 
-    async findById(TaiKhoanId: number): Promise<TaiKhoanEntity> {
+    async findById(taiKhoanId: number): Promise<TaiKhoanEntity> {
         const user = await this.accountRepository.findOne({
             select: {
-                TaiKhoanId: true,
+                taiKhoanId: true,
                 VaiTro: true,
             },
             where: {
-                TaiKhoanId: TaiKhoanId,
+                taiKhoanId: taiKhoanId,
             },
         });
         return user;
@@ -137,7 +143,7 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
                 refreshToken: true,
             },
             where: {
-                TaiKhoanId: taiKhoanId,
+                taiKhoanId: taiKhoanId,
                 refreshToken: refreshToken,
             },
         });
@@ -153,7 +159,7 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
     async findByEmail(email: string): Promise<TaiKhoanEntity> {
         return this.accountRepository.findOne({
             select: {
-                TaiKhoanId: true,
+                taiKhoanId: true,
             },
             where: {
                 Email: email,

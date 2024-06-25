@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { BuyerModule } from './buyer/buyer.module';
@@ -36,3 +37,4 @@ import { OrderDetailModule } from './orderdetail/orderdetail.module';
     ],
 })
 export class AppModule {}
+

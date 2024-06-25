@@ -15,9 +15,7 @@ export class DiscountCodeService extends BaseService<MaGiamGiaEntity, MaGiamGiaR
         const getnow = new Date(Date.now()).toLocaleString('vi');
         const formater = getnow.split(' ');
         const stringNow = `${formater[1]}T${formater[0]}`;
-        console.log(Date.apply(stringNow));
         const now = new Date(Date.apply(stringNow));
-        console.log('now : ', now);
         if (
             maGiamGiaDTO.ThoiGianBatDau < now ||
             (maGiamGiaDTO.ThoiGianKetThuc <= now && maGiamGiaDTO.ThoiGianKetThuc < maGiamGiaDTO.ThoiGianBatDau)
@@ -36,7 +34,6 @@ export class DiscountCodeService extends BaseService<MaGiamGiaEntity, MaGiamGiaR
         maGiamGiaEntity.ThoiGianKetThuc.setHours(maGiamGiaEntity.ThoiGianKetThuc.getHours() - 7);
 
         const a = await this.maGiamGiaRepository.save(maGiamGiaEntity);
-        console.log('time a : ', a.ThoiGianBatDau);
         return a;
     }
 

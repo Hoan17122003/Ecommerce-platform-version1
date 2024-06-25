@@ -21,7 +21,6 @@ export class JwtRefreshTokenGuard implements CanActivate {
             secret: process.env.JWT_REFRESH_TOKEN_SECRET,
         });
         requests.session.token = payload;
-        console.log('payload : ', payload);
 
         return this.authService.findToken(token, payload.payload);
     }

@@ -88,7 +88,7 @@ export class Product extends BaseEntity {
     })
     category: Categories;
 
-    @OneToMany(() => ChiTietDonHang, (chitietdonhang) => chitietdonhang.sanpham)
+    @OneToMany(() => ChiTietDonHang, (chitietdonhang) => chitietdonhang.sanpham, { cascade: true })
     @JoinColumn({
         name: 'MaSanPham',
     })

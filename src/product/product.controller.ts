@@ -55,15 +55,11 @@ export class ProductController {
         const products: SanPhamEntity[] = await this.AllProduct();
         let state = false;
 
-        console.log('productdto : ', productDTO);
         if (products.length > 0) {
             let leftPos = 0;
             let rightPost = products.length - 1;
-            console.log(products.length, rightPost);
             while (leftPos < rightPost) {
                 let mid = Math.floor((leftPos + rightPost) / 2);
-                console.log('mid : ', mid);
-                console.log('hehehe : ', products[mid].TenSanPham);
                 if (productDTO.TenSanPham >= products[mid].TenSanPham) {
                     leftPos = mid;
                 } else {
@@ -85,8 +81,6 @@ export class ProductController {
             .setMoTaSanPham(productDTO.MoTaSanPham)
             .setCategoty(productDTO.CategoryId)
             .Build();
-
-        // console.log('typeof : ', typeof ChiTietSanPham.SoLuong);
 
         try {
             const maNguoiBanHang = await session.user['payload'];

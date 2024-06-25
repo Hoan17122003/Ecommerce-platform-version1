@@ -23,7 +23,6 @@ export class RolesGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const vaitro = this.authService.findById(request.session.user.payload);
         const check = roles.includes((await vaitro).VaiTro);
-        console.log('check : ', check);
         return check;
     }
 }

@@ -1,9 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BaseEntity } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BaseEntity, JoinColumn } from 'typeorm';
 import { ChiTietMaGiamGia } from './ChiTietMaGiamGia.entity';
+import { DonHang } from './DonHang.entity';
 
 @Entity('MaGiamGIa')
 export class MaGiamGia extends BaseEntity {
-    @PrimaryGeneratedColumn('increment')
+    @PrimaryGeneratedColumn({
+        type: 'int',
+        name: 'MaGiamGiaId',
+    })
     MaGiamGiaId: number;
 
     @Column({
@@ -35,4 +39,10 @@ export class MaGiamGia extends BaseEntity {
     isActive: number;
 
     chitietmagiamgia: ChiTietMaGiamGia[];
+
+    @OneToMany(() => DonHang, (donhang) => donhang.maGiamGiaId, {
+        cascade: true,
+    })
+    @JoinColumn({ name: 'MaDonHang' })
+    donHang: DonHang[];
 }

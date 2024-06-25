@@ -156,7 +156,6 @@ export class VenderController {
                     });
                 }
                 const state = await this.discountcodeDetailService.destroy(maGiamGiaId[elemennt], maNguoiBanHang);
-                console.log('state : ', state);
                 // if (!state)
                 //     throw new Error(
                 //         `Id mã giảm giá : ${maGiamGiaId[elemennt]} không thuộc ${maNguoiBanHang} của người bán hàng`,

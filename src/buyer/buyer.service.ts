@@ -18,11 +18,9 @@ export class BuyerService extends BaseService<NguoiMuaHangEntity, NguoiMuaHangRe
         nguoiMuaHangEntity.Ten = nguoiMuaHang.Ten;
         nguoiMuaHangEntity.SDT = nguoiMuaHang.SDT;
         nguoiMuaHangEntity.NgayThangNamSinh = nguoiMuaHang.NgayThangNamSinh;
-        nguoiMuaHangEntity.MaNguoiMuaHang = taiKhoan.TaiKhoanId;
-        nguoiMuaHangEntity.viNguoiDung = null;
-        nguoiMuaHangEntity.binhLuanDanhGia = null;
-        nguoiMuaHangEntity.chats = null;
-        nguoiMuaHangEntity.donHang = null;
+        nguoiMuaHangEntity.maNguoiMuaHang = taiKhoan.taiKhoanId;
+        nguoiMuaHangEntity.taikhoan = taiKhoan;
+
         return this.repository.save(nguoiMuaHangEntity);
     }
 
@@ -31,6 +29,26 @@ export class BuyerService extends BaseService<NguoiMuaHangEntity, NguoiMuaHangRe
     }
 
     test() {
-        return 'hehehe';
+        return this.repository.store('Ha Duc', 'Hoan', '0707648207', null);
+    }
+
+    async getProfile(id: number) {
+        const data = await this.repository.findOne({
+            select: {
+                taikhoan: {
+                    AnhDaiDien: true,
+                    TenTaiKhoan: true,
+                    Email: true,
+                    VaiTro: true,
+                },
+            },
+            where: {
+                maNguoiMuaHang: id,
+            },
+            relations: {
+                taikhoan: true,
+            },
+        });
+        return data;
     }
 }

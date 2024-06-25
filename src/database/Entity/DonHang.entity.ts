@@ -4,6 +4,7 @@ import { NguoiMuaHang } from './NguoiMuaHang.entity';
 import { ChiTietNhaVanChuyen } from './ChiTietNhaVanChuyen.entity';
 import { ChiTietDonHang } from './ChiTietDonHang.entity';
 import { ThanhToan } from './ThanhToan.entity';
+import { MaGiamGia } from './MaGiamGia.entity';
 
 @Entity('DonHang')
 export class DonHang extends BaseEntity {
@@ -37,11 +38,15 @@ export class DonHang extends BaseEntity {
 
     @Column({
         type: 'int',
+        name: 'MaGiamGia',
+        // foreignKeyConstraintName: 'MaGiamGiaId',
+        default: null,
     })
-    discount: number;
+    maGiamGia: number;
 
     @Column({
-        type: 'text',
+        type: 'nvarchar',
+        length: 250,
         name: 'DiaChi',
     })
     diaChi: string;
@@ -53,21 +58,28 @@ export class DonHang extends BaseEntity {
     })
     phuongThucThanhToan: string;
 
-    @OneToMany(() => ChiTietDonHang, (chitieitdonhang) => chitieitdonhang.donhang)
+    @OneToMany(() => ChiTietDonHang, (chitieitdonhang) => chitieitdonhang.donhang, { cascade: true })
     @JoinColumn({ name: 'MaDonHang' })
     chitietdonhang: ChiTietDonHang[];
+
+    @ManyToOne(() => MaGiamGia)
+    @JoinColumn({
+        name: 'MaGiamGia',
+        foreignKeyConstraintName: 'fk_donhang_magiamgia',
+    })
+    maGiamGiaId: MaGiamGia;
 
     constructor(
         MaNguoiBanHang: number,
         MaNguoiMuaHang: number,
-        discount: number,
+        maGiamGia: number,
         diaChi: string,
         phuongThucThanhToan: string,
     ) {
         super();
         this.MaNguoiBanHang = MaNguoiBanHang;
         this.MaNguoiMuaHang = MaNguoiMuaHang;
-        this.discount = discount;
+        this.maGiamGia = maGiamGia;
         this.TrangThaiDonHang = 0;
         this.phuongThucThanhToan = phuongThucThanhToan;
         this.diaChi = diaChi;

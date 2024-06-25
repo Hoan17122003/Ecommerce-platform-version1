@@ -26,21 +26,23 @@ export class OrderDetailService extends BaseService<ChiTietDonHangEntity, ChiTie
         SoLuongMua: number,
         KichThuoc: string,
         MauSac: string,
-    ): Promise<ChiTietDonHangEntity> {
+    ): Promise<ChiTietDonHangEntity | null> {
+        let result: ChiTietDonHangEntity = null;
         try {
-            const billDetailEntity = new ChiTietDonHangEntity(
+            const billDetailEntity: ChiTietDonHangEntity = new ChiTietDonHangEntity(
                 sanPham.MaSanPham,
                 donHang.MaDonHang,
                 KichThuoc,
                 MauSac,
                 SoLuongMua,
             );
-            // billDetailEntity.donhang = donHang;
-            // billDetailEntity.sanpham = sanPham;
-
-            return this.chitietdonhangRepository.save(billDetailEntity);
+            billDetailEntity.donhang = donHang;
+            billDetailEntity.sanpham = sanPham;
+            result = await this.chitietdonhangRepository.save(billDetailEntity);
+            console.log('result : ', result);
         } catch (error) {
             throw new Error(error);
         }
+        return result;
     }
 }
