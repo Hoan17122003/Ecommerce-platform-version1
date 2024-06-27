@@ -51,6 +51,7 @@ export class OrderService extends BaseService<DonHangEntity, DonHangRepository> 
                 // boc tach cac key
                 if (!sanPham) throw new Error('sản phẩm không tồn tại');
                 if (!donhangEntity) {
+                    console.log('donhangEntity : ', donhangEntity);
                     donhangEntity = new DonHangEntity(
                         maNguoiMuaHang,
                         sanPham.Manguoibanhang,
@@ -76,7 +77,6 @@ export class OrderService extends BaseService<DonHangEntity, DonHangRepository> 
                             mauSac: item.MauSac,
                         })
                         .getOne();
-                    console.log('ctsp : ', chiTietSanPham);
                     if (!chiTietSanPham) throw new ForbiddenException('thông tin chi tiết sản phẩm không đúng');
                     else if (chiTietSanPham.SoLuong - chiTietSanPham.SoLuong < 0)
                         throw new ForbiddenException(

@@ -58,16 +58,14 @@ export class ProductController {
         if (products.length > 0) {
             let leftPos = 0;
             let rightPost = products.length - 1;
-            while (leftPos < rightPost) {
+            while (leftPos <= rightPost) {
                 let mid = Math.floor((leftPos + rightPost) / 2);
-                if (productDTO.TenSanPham >= products[mid].TenSanPham) {
-                    leftPos = mid;
-                } else {
-                    rightPost = mid;
-                }
                 if (productDTO.TenSanPham === products[mid].TenSanPham) {
                     state = true;
                 }
+                if (productDTO.TenSanPham > products[mid].TenSanPham) {
+                    leftPos = mid + 1;
+                } else rightPost = mid - 1;
             }
         }
 

@@ -69,9 +69,12 @@ export class OrderController {
     }
 
     // huỷ đơn hàng (chỉ huỷ được khi trạng thái đơn hàng đang ở 0 hoặc 1)
+    @Roles('NguoiMuaHang', 'NguoiBanHang')
+    @UseGuards(RolesGuard)
     @Delete('delete-order')
     async deleteFrom() {
-        // logic here
+        
+
     }
 
     @Get('get/:id')
