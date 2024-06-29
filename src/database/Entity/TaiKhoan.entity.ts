@@ -17,13 +17,16 @@ import * as argon from 'argon2';
 import { TaiKhoanDTO } from 'src/account/dto/account.dto';
 
 import { NguoiBanHangEntity, NguoiMuaHangEntity } from './index.entity';
+import { NguoiBanHang } from './NguoiBanHang.entity';
+import { NguoiMuaHang } from './NguoiMuaHang.entity';
 
 @Entity('TaiKhoan')
 export class TaiKhoan extends BaseEntity {
     @PrimaryGeneratedColumn({
         type: 'int',
+        name: 'TaiKhoanId',
     })
-    TaiKhoanId: number;
+    taiKhoanId: number;
 
     @Column({
         type: 'nvarchar',
@@ -82,12 +85,25 @@ export class TaiKhoan extends BaseEntity {
     })
     refreshToken: string;
 
-    // @OneToOne(() => NguoiMuaHang, nguoiMuaHang => nguoiMuaHang.taiKhoanId)
-    // nguoiMuaHang: Relation<NguoiMuaHang>;
+    @OneToOne(() => NguoiBanHang, (nguoibanhang) => nguoibanhang.taikhoan, {
+        cascade: true,
+    })
+    // @JoinColumn({ name: 'TaiKhoanId' })
+    @JoinColumn({
+        name: 'TaiKhoanId',
+        foreignKeyConstraintName: 'MaNguoiBanHang',
+    })
+    nguoiBanHang: NguoiBanHang;
 
-    // @OneToOne(() => NguoiBanHang, nguoiBanHang => nguoiBanHang.taiKhoanId)
-    // nguoiBanHang: Relation<NguoiBanHang>;
-
+    @OneToOne(() => NguoiMuaHang, (nguoimuahang) => nguoimuahang.taikhoan, {
+        cascade: true,
+    })
+    // @JoinColumn({ name: 'TaiKhoanId' })
+    @JoinColumn({
+        name: 'TaiKhoanId',
+        foreignKeyConstraintName: 'MaNguoiMuaHang',
+    })
+    nguoiMuaHang: NguoiMuaHang;
     @BeforeInsert()
     async hashPassword() {
         const MatKhau = await argon.hash(this.MatKhau, {

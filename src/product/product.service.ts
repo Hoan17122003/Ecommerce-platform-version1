@@ -27,8 +27,6 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
     constructor(
         @Inject('PRODUCT_REPOSITORY') private readonly rePository: SanPhamRepository,
         private readonly redisService: RedisService,
-        // private readonly OrderService: OrderService,
-        // private readonly OrderDetailService: OrderDetailService,
     ) {
         super(rePository);
         this.productRepository = new ProductRepository();
@@ -50,7 +48,6 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
                         continue;
                     }
                     this.products[pos].GiaBan = redisProducts[key];
-                    // console.log('value product ', this.products[pos].GiaBan, ' id : ', this.products[pos].MaSanPham);
                 }
                 this.flagTime = new Date(Date.now());
             }
@@ -81,7 +78,7 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
                 productDTO.ThuongHieu,
                 productDTO.CategoryId,
             );
-            sanPham.Manguoibanhang = nguoiBanHang.MaNguoiBanHang;
+            sanPham.Manguoibanhang = nguoiBanHang.maNguoiBanHang;
             sanPham.seller = nguoiBanHang;
 
             const result = await this.productRepository.addProduct(sanPham, ChiTietSanPham);
@@ -106,7 +103,6 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
     async DeletedProduct(maSanPham: number, maNguoiBanHang: number): Promise<string> {
         try {
             const result = await this.productRepository.findDelete(maSanPham, maNguoiBanHang);
-            console.log('result : ', result);
             if (!result) throw new ForbiddenException('không thể xoá');
             return 'xoá thành công';
         } catch (error) {
@@ -138,8 +134,6 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
     }
 
     async findProductId(id: number, maNguoiBanHang?: number): Promise<SanPhamEntity | undefined> {
-        console.log(typeof id, id);
-        console.log(typeof maNguoiBanHang, maNguoiBanHang);
         const product = await this.rePository.findOne({
             where: {
                 MaSanPham: id,
@@ -183,11 +177,9 @@ export class ProductService extends BaseService<SanPhamEntity, SanPhamRepository
     async setPrice(productId: number, discount: number, flag: number): Promise<void> {
         const cacheKey = `ProductOfDiscount:${productId}`;
         let newPrice;
-        console.log('flag : ', flag);
         if (flag) {
             newPrice = this.redisService.remove(cacheKey);
         } else {
-            console.log('update price');
             const products = await this.AllProduct();
             let pos = await this.findId(products, productId);
             const price = products[pos].GiaBan;

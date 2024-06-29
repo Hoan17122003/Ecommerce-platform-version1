@@ -29,11 +29,11 @@ export class JwtAccessTokenGuard implements CanActivate {
             const payload = await this.jwtService.verifyAsync(token, {
                 secret: process.env.JWT_ACCESS_TOKEN_SECRET,
             });
-            const taiKhoanId = payload.payload;
-            const user = await this.authService.findById(Number.parseInt(taiKhoanId));
+            const user = await this.authService.findById(Number.parseInt(payload.payload));
             if (!user) throw new ForbiddenException();
 
             request.session.user = payload;
+            request.session.account = user;
         } catch (error) {
             throw new ForbiddenException(error);
         }

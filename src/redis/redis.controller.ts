@@ -17,7 +17,6 @@ export class RedisController {
 
     @Post('cache-product')
     public async setProduct(@Body('data') data: { productId: number; price: number }) {
-        console.log('data : ', data);
         return this.redisService.setPrice(`ProductOfDiscount:${data.productId}`, data.price);
     }
 }

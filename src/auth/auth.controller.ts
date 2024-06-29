@@ -20,7 +20,8 @@ import { JwtAccessTokenGuard } from './guard/JwtAccessAuth.guard';
 import { Public } from 'src/decorators/auth.decorators';
 import { JwtRefreshTokenGuard } from './guard/JwtRefreshAuth.guard';
 import { MailService } from 'src/mail/mai.service';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Auth')
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Auth')
 export class AuthController {
@@ -32,10 +33,10 @@ export class AuthController {
     @Public()
     @UseGuards(LocalAuthGuard)
     @Post('login/local')
-    async login(@Req() request: Request, @Res() res: Response, @Session() session: Record<string, any>) {
+    async login(@Session() session: Record<string, any>) {
         try {
             const token = await this.authService.signIn(session.payload);
-            return res.status(HttpStatus.OK).json({ token });
+            return token;
         } catch (error) {
             throw new UnauthorizedException(error);
         }

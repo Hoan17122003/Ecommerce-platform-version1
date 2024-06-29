@@ -17,14 +17,7 @@ export class AccountRepository {
         this.repository = dataSource.getRepository(TaiKhoanEntity);
     }
 
-    async getProfile(id: number, vaitro: string): Promise<TaiKhoanEntity | undefined> {
-        const accountRepository = dataSource.getRepository(TaiKhoanEntity);
-        if (vaitro == 'NguoiMuaHang') {
-            return await accountRepository.query(`select * from [dbo].account_getProfile_NguoiMuaHang(${id})`);
-        } else if (vaitro == 'NguoiBanHang') {
-            return await accountRepository.query(`select * from [dbo].account_getProfile_NguoiBanHang(${id})`);
-        }
-    }
+
 
     async findInformation(tenDangNhap: string, Email: string, SDT: string, vaitro: string): Promise<boolean> {
         // try {

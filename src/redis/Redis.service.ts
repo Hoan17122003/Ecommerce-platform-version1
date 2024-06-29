@@ -65,7 +65,7 @@ export class RedisService {
     }
 
     async setnotification(maNguoiBanHang: number, content: Notification): Promise<number> {
-        const cacheKey = `NotificationOfVender:${maNguoiBanHang}`;
+        const cacheKey = `Account:${maNguoiBanHang}`;
         const check = await this.client.set(`${cacheKey}`, JSON.stringify(content));
         return check;
     }

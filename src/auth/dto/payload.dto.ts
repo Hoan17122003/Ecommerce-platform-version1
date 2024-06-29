@@ -1,4 +1,4 @@
 interface PayLoadDTO {
-    TaiKhoanId: number;
-    TenDangNhap: string;
+    taiKhoanId: number;
+    TenTaiKhoan: string;
 }

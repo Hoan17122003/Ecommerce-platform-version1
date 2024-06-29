@@ -25,7 +25,9 @@ import { JwtAccessTokenGuard } from 'src/auth/guard/JwtAccessAuth.guard';
 import { UserRole } from 'src/account/enums/role.enum';
 import { RedisService } from 'src/redis/Redis.service';
 import { ChiTietMaGiamGia } from 'src/database/Entity/ChiTietMaGiamGia.entity';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Vender')
 @UseGuards(JwtAccessTokenGuard)
 @Controller('NguoiBanHang')
 export class VenderController {
@@ -156,7 +158,6 @@ export class VenderController {
                     });
                 }
                 const state = await this.discountcodeDetailService.destroy(maGiamGiaId[elemennt], maNguoiBanHang);
-                console.log('state : ', state);
                 // if (!state)
                 //     throw new Error(
                 //         `Id mã giảm giá : ${maGiamGiaId[elemennt]} không thuộc ${maNguoiBanHang} của người bán hàng`,

@@ -29,7 +29,9 @@ import { Roles } from 'src/decorators/role.decoratos';
 import { JwtRefreshTokenGuard } from 'src/auth/guard/JwtRefreshAuth.guard';
 import { MailService } from 'src/mail/mai.service';
 import { LocalAuthGuard } from 'src/auth/guard/LocalAuth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Account')
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Account')
 export class AccountController {
@@ -60,13 +62,12 @@ export class AccountController {
             const tokenRandom = Math.floor(Math.random() * 9) + 1;
             validateToken += tokenRandom.toString();
         }
-        console.log('validate : ', validateToken);
         await this.mailService.sendUserConfirmation({
             email: `${nameEmail}@${format}`,
             subject: 'Welcome to web-ecommerce! Confirm your Email',
             content: validateToken,
         });
-        return {validateToken};
+        return { validateToken };
     }
 
     // gọi cập nhật trạng thái tài khoản
@@ -96,7 +97,8 @@ export class AccountController {
         @Session() session: Record<string, any>,
     ) {
         try {
-            if (Number.parseInt(session.user.payload) != id) throw new ForbiddenException();
+            const user = session.user['payload'];
+            if (Number.parseInt(session.user['payload']) != id) throw new ForbiddenException();
         } catch (error) {
             throw new ForbiddenException();
         }

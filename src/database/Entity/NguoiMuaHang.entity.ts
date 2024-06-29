@@ -22,12 +22,9 @@ import { NguoiMuaHangEntity, TaiKhoanEntity } from './index.entity';
 export class NguoiMuaHang extends BaseEntity {
     @PrimaryColumn({
         type: 'int',
-        // name : 'MaNguoiMuaHang',
-        primaryKeyConstraintName: 'MaNguoiMuaHang',
+        name: 'MaNguoiMuaHang',
     })
-    // @OneToOne(() => TaiKhoan)
-    // @JoinColumn()
-    MaNguoiMuaHang: number;
+    maNguoiMuaHang: number;
 
     @Column({
         type: 'nvarchar',
@@ -52,6 +49,10 @@ export class NguoiMuaHang extends BaseEntity {
         type: 'date',
     })
     NgayThangNamSinh: Date;
+
+    @OneToOne(() => TaiKhoan)
+    @JoinColumn({ name: 'MaNguoiMuaHang' })
+    taikhoan: TaiKhoan;
 
     chats: Chat[];
 

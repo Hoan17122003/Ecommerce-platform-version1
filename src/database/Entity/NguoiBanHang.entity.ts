@@ -26,9 +26,7 @@ export class NguoiBanHang extends BaseEntity {
         type: 'int',
         name: 'MaNguoiBanHang',
     })
-    // @OneToOne(() => TaiKhoan)
-    // @JoinColumn()
-    MaNguoiBanHang: number;
+    maNguoiBanHang: number;
 
     @Column({
         type: 'nvarchar',
@@ -63,12 +61,18 @@ export class NguoiBanHang extends BaseEntity {
     chats: Chat;
 
     // @ManyToMany(() => SanPhamEntity)
-    // @JoinTable()
+    // @JoinTable()RR
     // chiTietMaGiamGia: ChiTietMaGiamGia[];
 
     @OneToMany(() => SanPhamEntity, (sanpham) => sanpham.seller)
     @JoinColumn({ name: 'MaSanPham' })
     SanPham: SanPhamEntity[];
+
+    @OneToOne(() => TaiKhoan)
+    @JoinColumn({
+        name: 'MaNguoiBanHang',
+    })
+    taikhoan: TaiKhoan;
 
     // @OneToOne(() => ViNguoiDung, (vinguoidung) => vinguoidung.nguoiBanHang)
     // @JoinColumn({ name: 'MaViNguoiDung' })

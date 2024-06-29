@@ -38,10 +38,10 @@ export class AuthService {
         // xác thực tài khoản
         if (!payload) throw new UnauthorizedException('Sai thông tin đăng nhập');
 
-        const refresh_token = await this.generateRefreshToken(payload.TaiKhoanId);
-        await this.accountService.setRefreshToken(refresh_token, payload.TaiKhoanId);
+        const refresh_token = await this.generateRefreshToken(payload.taiKhoanId);
+        await this.accountService.setRefreshToken(refresh_token, payload.taiKhoanId);
         const token = await {
-            access_token: this.generateAccessToken(payload.TaiKhoanId),
+            access_token: this.generateAccessToken(payload.taiKhoanId),
             refresh_token,
         };
         return token;
@@ -51,7 +51,7 @@ export class AuthService {
         return this.jwtService.sign(
             { payload },
             {
-                secret: 'access_token_secret',
+                secret: process.env.JWT_ACCESS_TOKEN_SECRET,
                 expiresIn: process.env.JWT_ACCESS_TOKEN_TIME,
             },
         );
@@ -61,13 +61,13 @@ export class AuthService {
         return this.jwtService.sign(
             { payload },
             {
-                secret: 'refresh_token_secret',
+                secret: process.env.JWT_REFRESH_TOKEN_SECRET,
                 expiresIn: process.env.JWT_REFRESH_TOKEN_TIME,
             },
         );
     }
 
-    private async verifyPlainContentwithHashedContent(hashedPassword: string, plainText): Promise<boolean> {
+    private async verifyPlainContentwithHashedContent(hashedPassword: string, plainText: string): Promise<boolean> {
         const isMatching = await argon.verify(hashedPassword, plainText);
         if (!isMatching) return false;
         return true;

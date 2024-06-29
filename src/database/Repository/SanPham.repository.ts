@@ -15,10 +15,6 @@ import { ChiTietSanPhamDTO } from '../../product/dto/chitietsanpham/ChiTietSanPh
 import { NguoiBanHang } from '../Entity/NguoiBanHang.entity';
 import { ChiTietMaGiamGia } from '../Entity/ChiTietMaGiamGia.entity';
 
-// Hoàn ngày 17/04/2024 gửi Hoàn của tương lai đôi vài điều :
-// xin lỗi vì viết hiện tại t viết code như cái đặc cầu và comment cũng đéo chuẩn cái moẹ gì, logic thì phức tạp
-// t biết tương lai m sẽ chửi t nên t cũng gửi đôi lời tâm sự :), chạy được là được rồi đừng có đụng vào đụng vào là đéo chạy đâu :)
-
 // create repository not logic and can't handler
 export class SanPhamRepository extends Repository<SanPhamEntity> {}
 
@@ -35,8 +31,6 @@ export class ProductRepository {
     }
 
     public async findAll(): Promise<SanPhamEntity[]> {
-        // console.log('product : ', await this.productRepository.createQueryBuilder().getMany());
-
         const data = await this.productRepository.find({
             select: {
                 TenSanPham: true,
@@ -220,9 +214,6 @@ export class ProductRepository {
                 ProductId,
             })
             .getMany();
-        console.log('ChiTietSanPham : ', ChiTietSanPham);
-        console.log('SanPham : ', sanpham);
-
         return {
             SanPhamEntity: sanpham,
             ChiTietSanPhamEntity: ChiTietSanPham,

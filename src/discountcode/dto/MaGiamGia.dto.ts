@@ -23,8 +23,6 @@ export class MaGiamGiaDTO {
     constructor(LoaiGiamGia: string, ThoiGianBatDau: string, ThoiGianKetThuc: string, discount: number) {
         const thoiGianBatDau = new Date(ThoiGianBatDau);
         const thoiGianKetThuc = new Date(ThoiGianKetThuc);
-        console.log('thoigianbatdau : ', thoiGianBatDau);
-        console.log('thoigianketthuc : ', thoiGianKetThuc);
 
         this.LoaiGiamGia = LoaiGiamGia;
         this.ThoiGianBatDau = thoiGianBatDau;

@@ -27,8 +27,10 @@ import { ProductInner } from './dto/product/ProductInner';
 import { dataSource } from 'src/database/database.providers';
 import { NguoiBanHangEntity, NguoiMuaHangEntity, SanPhamEntity } from 'src/database/Entity/index.entity';
 import { UserRole } from 'src/account/enums/role.enum';
+import { ApiTags } from '@nestjs/swagger';
 // @UseGuards(RolesGuard)
 
+@ApiTags('Product')
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Product')
 export class ProductController {
@@ -55,23 +57,17 @@ export class ProductController {
         const products: SanPhamEntity[] = await this.AllProduct();
         let state = false;
 
-        console.log('productdto : ', productDTO);
         if (products.length > 0) {
             let leftPos = 0;
             let rightPost = products.length - 1;
-            console.log(products.length, rightPost);
-            while (leftPos < rightPost) {
+            while (leftPos <= rightPost) {
                 let mid = Math.floor((leftPos + rightPost) / 2);
-                console.log('mid : ', mid);
-                console.log('hehehe : ', products[mid].TenSanPham);
-                if (productDTO.TenSanPham >= products[mid].TenSanPham) {
-                    leftPos = mid;
-                } else {
-                    rightPost = mid;
-                }
                 if (productDTO.TenSanPham === products[mid].TenSanPham) {
                     state = true;
                 }
+                if (productDTO.TenSanPham > products[mid].TenSanPham) {
+                    leftPos = mid + 1;
+                } else rightPost = mid - 1;
             }
         }
 
@@ -85,8 +81,6 @@ export class ProductController {
             .setMoTaSanPham(productDTO.MoTaSanPham)
             .setCategoty(productDTO.CategoryId)
             .Build();
-
-        // console.log('typeof : ', typeof ChiTietSanPham.SoLuong);
 
         try {
             const maNguoiBanHang = await session.user['payload'];

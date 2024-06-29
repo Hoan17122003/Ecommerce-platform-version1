@@ -27,7 +27,8 @@ export class VenderService extends BaseService<NguoiBanHangEntity, NguoiBanHangR
         nguoiBanHangEntity.SDT = nguoiBanHang.SDT;
         nguoiBanHangEntity.NgayThangNamSInh = nguoiBanHang.NgayThangNamSinh;
         nguoiBanHangEntity.DiaChi = nguoiBanHang.DiaChi;
-        nguoiBanHangEntity.MaNguoiBanHang = taiKhoan.TaiKhoanId;
+        nguoiBanHangEntity.maNguoiBanHang = taiKhoan.taiKhoanId;
+        nguoiBanHangEntity.taikhoan = taiKhoan;
 
         return this.nguoiBanHangRepository.save(nguoiBanHangEntity, {
             reload: true,
@@ -56,5 +57,24 @@ export class VenderService extends BaseService<NguoiBanHangEntity, NguoiBanHangR
             })
             .getOne()
             .then((entity) => (entity ? Promise.resolve(entity) : Promise.reject('model not found')));
+    }
+
+    async getProfile(id: number) {
+        return this.nguoiBanHangRepository.findOne({
+            select: {
+                taikhoan: {
+                    AnhDaiDien: true,
+                    TenTaiKhoan: true,
+                    Email: true,
+                    VaiTro: true,
+                },
+            },
+            where: {
+                maNguoiBanHang: id,
+            },
+            relations: {
+                taikhoan: true,
+            },
+        });
     }
 }
