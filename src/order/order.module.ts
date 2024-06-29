@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { DonHangEntity } from 'src/database/Entity/index.entity';
 import { DatabaseModule } from 'src/database/database.module';
 import { unknowProviders } from 'src/middleware/dynamic-providers.providers';
@@ -11,6 +11,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { RedisModule } from 'src/redis/redis.module';
 import { NotificationModule } from 'src/notification/notification.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { LoggingMiddleware } from 'src/middleware/loggingMidleWareOrder.midleware';
+import { AccountModule } from 'src/account/account.module';
 @Module({
     imports: [
         DatabaseModule,
@@ -20,9 +22,14 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
         RedisModule,
         NotificationModule,
         JwtModule.register({}),
+        AccountModule,
     ],
     providers: [unknowProviders('BILL_REPOSITORY', DonHangEntity), OrderService, JwtService],
     controllers: [OrderController],
     exports: [OrderService],
 })
-export class OrderModule {}
+export class OrderModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoggingMiddleware).forRoutes({ path: 'orders/delete-order/', method: RequestMethod.DELETE });
+    }
+}

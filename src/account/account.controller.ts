@@ -29,7 +29,9 @@ import { Roles } from 'src/decorators/role.decoratos';
 import { JwtRefreshTokenGuard } from 'src/auth/guard/JwtRefreshAuth.guard';
 import { MailService } from 'src/mail/mai.service';
 import { LocalAuthGuard } from 'src/auth/guard/LocalAuth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Account')
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Account')
 export class AccountController {

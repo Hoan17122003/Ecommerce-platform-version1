@@ -125,6 +125,7 @@ export class AccountService extends BaseService<TaiKhoanEntity, TaiKhoanReposito
             select: {
                 taiKhoanId: true,
                 VaiTro: true,
+                TenTaiKhoan: true,
             },
             where: {
                 taiKhoanId: taiKhoanId,

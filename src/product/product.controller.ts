@@ -27,8 +27,10 @@ import { ProductInner } from './dto/product/ProductInner';
 import { dataSource } from 'src/database/database.providers';
 import { NguoiBanHangEntity, NguoiMuaHangEntity, SanPhamEntity } from 'src/database/Entity/index.entity';
 import { UserRole } from 'src/account/enums/role.enum';
+import { ApiTags } from '@nestjs/swagger';
 // @UseGuards(RolesGuard)
 
+@ApiTags('Product')
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Product')
 export class ProductController {

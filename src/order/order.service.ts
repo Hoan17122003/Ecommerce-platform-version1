@@ -51,7 +51,6 @@ export class OrderService extends BaseService<DonHangEntity, DonHangRepository> 
                 // boc tach cac key
                 if (!sanPham) throw new Error('sản phẩm không tồn tại');
                 if (!donhangEntity) {
-                    console.log('donhangEntity : ', donhangEntity);
                     donhangEntity = new DonHangEntity(
                         maNguoiMuaHang,
                         sanPham.Manguoibanhang,
@@ -63,7 +62,6 @@ export class OrderService extends BaseService<DonHangEntity, DonHangRepository> 
                 }
 
                 for (let item of donHang[element]) {
-                    console.log('itme : ', item);
                     const chiTietSanPham = await dataSource
                         .getRepository(ChiTietSanPhamEntity)
                         .createQueryBuilder()
@@ -77,8 +75,9 @@ export class OrderService extends BaseService<DonHangEntity, DonHangRepository> 
                             mauSac: item.MauSac,
                         })
                         .getOne();
+                    console.log('chitietsanpham : ', chiTietSanPham);
                     if (!chiTietSanPham) throw new ForbiddenException('thông tin chi tiết sản phẩm không đúng');
-                    else if (chiTietSanPham.SoLuong - chiTietSanPham.SoLuong < 0)
+                    else if (chiTietSanPham.SoLuong - item.SoLuong < 0)
                         throw new ForbiddenException(
                             'Số lượng sản phẩm không đủ để đáp ứng nhu cầu mua của khách hàng',
                         );
@@ -101,14 +100,44 @@ export class OrderService extends BaseService<DonHangEntity, DonHangRepository> 
         }
     }
 
-    async getOrder(id: number) {
-        return this.donhangRepository.findOne({
-            where: {
-                MaDonHang: id,
-            },
-            relations: {
-                chitietdonhang: true,
-            },
-        });
+    async DeleteOrder(maDonHang: number) {
+        console.log('maDonHang : ', maDonHang);
+        const flag = await this.donhangRepository.delete({ MaDonHang: maDonHang });
+        return flag.affected;
+    }
+
+    public async getOrder(id: number, userId: number, vaitro: string): Promise<DonHang | null> {
+        let result: DonHang;
+        if (vaitro.toLowerCase() === 'nguoimuahang') {
+            result = await this.donhangRepository.findOne({
+                where: {
+                    MaDonHang: id,
+                    MaNguoiMuaHang: userId,
+                },
+                relations: {
+                    chitietdonhang: true,
+                },
+            });
+        } else {
+            result = await this.donhangRepository.findOne({
+                where: {
+                    MaDonHang: id,
+                    MaNguoiBanHang: userId,
+                },
+                relations: {
+                    chitietdonhang: true,
+                },
+            });
+        }
+        return result;
+    }
+
+    public async ChangeState(donHang: DonHangEntity, flag: string): Promise<number> {
+        if (flag.toLowerCase() === 'increament') donHang.TrangThaiDonHang += 1;
+        else {
+            if (donHang.TrangThaiDonHang > 0) donHang.TrangThaiDonHang -= 1;
+        }
+        const isCheck: DonHangEntity = await this.donhangRepository.save(donHang);
+        return isCheck ? 1 : 0;
     }
 }

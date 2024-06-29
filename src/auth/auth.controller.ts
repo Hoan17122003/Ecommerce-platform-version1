@@ -20,7 +20,8 @@ import { JwtAccessTokenGuard } from './guard/JwtAccessAuth.guard';
 import { Public } from 'src/decorators/auth.decorators';
 import { JwtRefreshTokenGuard } from './guard/JwtRefreshAuth.guard';
 import { MailService } from 'src/mail/mai.service';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Auth')
 @UseGuards(JwtAccessTokenGuard)
 @Controller('Auth')
 export class AuthController {

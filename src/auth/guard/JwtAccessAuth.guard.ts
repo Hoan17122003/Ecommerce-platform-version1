@@ -33,6 +33,7 @@ export class JwtAccessTokenGuard implements CanActivate {
             if (!user) throw new ForbiddenException();
 
             request.session.user = payload;
+            request.session.account = user;
         } catch (error) {
             throw new ForbiddenException(error);
         }

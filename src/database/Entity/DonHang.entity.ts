@@ -70,8 +70,8 @@ export class DonHang extends BaseEntity {
     maGiamGiaId: MaGiamGia;
 
     constructor(
-        MaNguoiBanHang: number,
         MaNguoiMuaHang: number,
+        MaNguoiBanHang: number,
         maGiamGia: number,
         diaChi: string,
         phuongThucThanhToan: string,
